@@ -1,0 +1,511 @@
+/* JM BLOG - CRT/Glitch Terminal Theme */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
+:root {
+  --green: #00ff41;
+  --green-bright: #00ff7f;
+  --green-dim: #00aa2a;
+  --green-dark: #006600;
+  --green-glow: rgba(0, 255, 65, 0.5);
+  --black: #000000;
+  --dark: #001100;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  background-color: #000000;
+  background: #000000;
+}
+
+body {
+  background-color: #000000;
+  background: #000000;
+  color: var(--green);
+  font-family: 'Fira Code', 'Courier New', 'Lucida Console', monospace;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== CRT EFFECTS ===== */
+
+/* Scanlines overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.25),
+    rgba(0, 0, 0, 0.25) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* CRT vignette/curve effect */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  box-shadow: inset 0 0 200px rgba(0, 255, 65, 0.02);
+}
+
+/* Flicker animation - very subtle */
+@keyframes flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+    opacity: 1;
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    opacity: 0.995;
+  }
+}
+
+body {
+  animation: flicker 8s infinite;
+}
+
+/* Glitch effect for titles */
+@keyframes glitch {
+  0%, 90%, 100% {
+    text-shadow: 
+      0 0 10px var(--green),
+      0 0 30px var(--green-glow),
+      0 0 50px rgba(0, 255, 65, 0.3);
+    transform: translateX(0);
+  }
+  91% {
+    text-shadow: 
+      3px 0 #ff0040,
+      -3px 0 #00ffff,
+      0 0 20px var(--green);
+    transform: translateX(2px);
+  }
+  93% {
+    text-shadow: 
+      -2px 0 #ff0040,
+      2px 0 #00ffff,
+      0 0 20px var(--green);
+    transform: translateX(-3px);
+  }
+  95% {
+    text-shadow: 
+      2px 0 #00ffff,
+      -2px 0 #ff0040,
+      0 0 20px var(--green);
+    transform: translateX(1px);
+  }
+}
+
+/* Right side glow (like in the image) */
+.right-glow {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 200px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 65, 0.02) 40%,
+    rgba(0, 255, 65, 0.06) 100%
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Horizontal glitch bars */
+@keyframes glitchBar {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.glitch-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 65, 0.2) 20%,
+    var(--green) 50%,
+    rgba(0, 255, 65, 0.2) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 998;
+  animation: glitchBar 0.1s ease-out;
+}
+
+/* ===== LAYOUT ===== */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px 120px;
+  position: relative;
+  z-index: 10;
+  background: transparent;
+}
+
+/* ===== ASCII TITLE ===== */
+
+.ascii-title {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 9px;
+  line-height: 11px;
+  color: var(--green);
+  text-shadow: 
+    0 0 10px var(--green),
+    0 0 30px var(--green-glow),
+    0 0 50px rgba(0, 255, 65, 0.25);
+  margin-bottom: 40px;
+  animation: glitch 8s infinite;
+  white-space: pre;
+}
+
+@media (min-width: 600px) {
+  .ascii-title {
+    font-size: 10px;
+    line-height: 12px;
+  }
+}
+
+/* ===== TERMINAL PROMPT ===== */
+
+.terminal-prompt {
+  font-size: 14px;
+  color: var(--green-dim);
+  margin-bottom: 15px;
+}
+
+.terminal-prompt::before {
+  content: "> ";
+  color: var(--green);
+}
+
+/* ===== POST LIST ===== */
+
+.post-list {
+  list-style: none;
+}
+
+.post-item {
+  display: flex;
+  gap: 15px;
+  padding: 10px;
+  margin-bottom: 2px;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.post-item:hover {
+  border-left-color: var(--green);
+  background: rgba(0, 255, 65, 0.05);
+  text-shadow: 0 0 10px var(--green);
+}
+
+.post-item a {
+  display: flex;
+  gap: 15px;
+  text-decoration: none;
+  width: 100%;
+}
+
+.post-date {
+  color: var(--green-dim);
+  min-width: 100px;
+  font-size: 14px;
+}
+
+.post-file {
+  color: var(--green);
+  font-size: 14px;
+  text-shadow: 0 0 5px var(--green-glow);
+}
+
+/* ===== CURSOR ===== */
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 18px;
+  background: var(--green);
+  vertical-align: middle;
+  margin-left: 5px;
+  box-shadow: 0 0 10px var(--green), 0 0 20px var(--green-glow);
+  animation: blink 1s infinite;
+}
+
+.prompt-line {
+  margin-top: 40px;
+  font-size: 14px;
+  color: var(--green-dim);
+}
+
+.prompt-line::before {
+  content: "> ";
+  color: var(--green);
+}
+
+/* ===== STATUS BAR ===== */
+
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 30px;
+  background: rgba(0, 10, 0, 0.95);
+  border-top: 1px solid rgba(0, 255, 65, 0.25);
+  font-size: 12px;
+  color: var(--green-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+  text-shadow: 0 0 5px var(--green);
+}
+
+.status-bar a {
+  color: var(--green-dim);
+  text-decoration: none;
+  margin-left: 20px;
+  transition: all 0.15s;
+}
+
+.status-bar a:hover {
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green);
+}
+
+.status-bar a::before {
+  content: "[";
+  opacity: 0.6;
+}
+
+.status-bar a::after {
+  content: "]";
+  opacity: 0.6;
+}
+
+/* ===== ARTICLE STYLES ===== */
+
+article {
+  padding-bottom: 2rem;
+}
+
+article .post-header {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--green-dim);
+}
+
+article h1 {
+  font-size: 1.6rem;
+  color: var(--green);
+  margin-bottom: 15px;
+  line-height: 1.4;
+  text-shadow: 
+    0 0 10px var(--green),
+    0 0 30px var(--green-glow);
+  animation: glitch 10s infinite;
+}
+
+article .meta {
+  font-size: 0.85rem;
+  color: var(--green-dim);
+}
+
+article .meta::before {
+  content: "// ";
+}
+
+article h2 {
+  font-size: 1.3rem;
+  color: var(--green);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 8px var(--green), 0 0 15px var(--green-glow);
+}
+
+article h2::before {
+  content: "## ";
+  opacity: 0.5;
+}
+
+article h3 {
+  font-size: 1.1rem;
+  color: var(--green);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+article h3::before {
+  content: "### ";
+  opacity: 0.4;
+}
+
+article p {
+  margin-bottom: 1.25rem;
+  color: var(--green);
+  font-size: 15px;
+}
+
+article strong {
+  color: var(--green-bright);
+  text-shadow: 0 0 5px var(--green-glow);
+}
+
+article em {
+  color: var(--green);
+  font-style: italic;
+}
+
+article a {
+  color: var(--green-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+article a:hover {
+  text-shadow: 0 0 10px var(--green);
+}
+
+article ul, article ol {
+  margin-bottom: 1.25rem;
+  padding-left: 2rem;
+}
+
+article li {
+  margin-bottom: 0.5rem;
+}
+
+article li::marker {
+  color: var(--green-dim);
+}
+
+/* Code blocks */
+article pre {
+  background: rgba(0, 20, 0, 0.8);
+  border: 1px solid var(--green-dim);
+  border-left: 3px solid var(--green);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  font-size: 14px;
+}
+
+article code {
+  font-family: 'Fira Code', monospace;
+  color: var(--green-bright);
+}
+
+article p code {
+  background: rgba(0, 20, 0, 0.8);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Blockquotes */
+article blockquote {
+  border-left: 3px solid var(--green);
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+  color: var(--green-dim);
+  font-style: italic;
+}
+
+/* Signature */
+.signature {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--green-dim);
+  font-style: italic;
+  color: var(--green-dim);
+}
+
+.signature::before {
+  content: "$ ";
+  color: var(--green);
+}
+
+/* Back link */
+.back-link {
+  display: inline-block;
+  margin-bottom: 30px;
+  color: var(--green-dim);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.back-link::before {
+  content: "← ";
+}
+
+.back-link:hover {
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 15px 100px;
+  }
+  
+  .ascii-title {
+    font-size: 6px;
+    line-height: 7px;
+  }
+  
+  .post-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .post-date {
+    min-width: auto;
+  }
+  
+  article h1 {
+    font-size: 1.3rem;
+  }
+  
+  .status-bar {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
