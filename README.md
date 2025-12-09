@@ -31,7 +31,7 @@ In the `posts` array in the JavaScript:
 
 ```javascript
 const posts = [
-  { file: 'MY_NEW_POST.log', url: 'posts/my-new-post.html', date: '2049-12-07', size: '3.2K', title: 'My New Post', excerpt: 'Short description...' },
+  { file: 'MY_NEW_POST.log', url: 'posts/my-new-post.html', date: '2025-12-07', size: '3.2K', title: 'My New Post', excerpt: 'Short description...' },
   // ... other posts
 ];
 ```
