@@ -32,7 +32,7 @@
     <article>
       <div class="post-header">
         <h1>The Illusion of Determinism</h1>
-        <p class="meta">2025-12-09 // Epistemology, Objectivity, Consensus</p>
+        <p class="meta">2025-12-09 // <span id="content-hash">0x...</span> // Objectivity, Consensus, GenLayer</p>
       </div>
 
       <p><em>Why all blockchain truth is subjective — and why that's okay.</em></p>
@@ -43,11 +43,11 @@
 
       <h2>The Spectrum of Verification</h2>
 
-      <p>Truth is not binary. There's no switch that separates the objective from the subjective. What exists is a <strong>gradient of verification cost</strong> — how much effort, consensus, and assumptions we need to accept something as true.</p>
+      <p>There's no switch that separates the objective from the subjective. What exists is a <strong>gradient of verification cost</strong> — how much effort, consensus, and assumptions we need to accept something as true or correct.</p>
 
       <p>We can distinguish four levels:</p>
 
-      <p><strong>Level 0: Logical axioms.</strong> $A = A$. The principle of non-contradiction. These truths are self-evident. They require no external consensus because denying them destroys the very possibility of reasoning. Nobody votes on whether $A = A$ is correct.</p>
+      <p><strong>Level 0: Logical axioms.</strong> $A = A$. The principle of non-contradiction. These truths are self-evident. They require no external consensus because denying them destroys the very possibility of reasoning. Nobody needs to vote on whether $A = A$ is correct.</p>
 
       <p><strong>Level 1: Formal deduction.</strong> $2 + 2 = 4$ under the rules of arithmetic. A ZK proof that verifies a computation. A smart contract on Ethereum. It seems objective, but there's a crucial nuance: it requires consensus on the rules. If 51% of Ethereum nodes decided to modify the ADD opcode to sum 5, then $2 + 2 = 5$ on that chain. The "truth" here is intersubjective: we agree to follow these rules, and that's what makes them valid.</p>
 
@@ -93,12 +93,12 @@
         GenLayer didn't invent subjectivity. It just stopped pretending it didn't exist.
       </blockquote>
 
-      <div class="signature">JM // GenLayer</div>
+      <div class="signature">JM</div>
     </article>
   </div>
 
   <div class="status-bar">
-    <span>SYSTEM STATUS: ONLINE // TYPE 'help' FOR COMMANDS.</span>
+    <span id="reading-progress">READING: 0% COMPLETE</span>
     <div>
       <a href="https://github.com/jmlago">GitHub</a>
       <a href="https://x.com/josemlago">X</a>
@@ -106,6 +106,23 @@
   </div>
 
   <script>
+    // Reading progress tracker
+    let maxProgress = 0;
+    function updateReadingProgress() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrolled = window.scrollY;
+      const currentProgress = documentHeight > 0 ? Math.min(100, Math.round((scrolled / documentHeight) * 100)) : 0;
+      maxProgress = Math.max(maxProgress, currentProgress);
+      const el = document.getElementById('reading-progress');
+      el.textContent = 'READING 001_ILLUSION_DETERMINISM.log // ' + maxProgress + '% COMPLETE';
+      el.style.color = maxProgress >= 100 ? 'var(--green)' : '#ff9500';
+      el.style.textShadow = maxProgress >= 100 ? '0 0 5px var(--green)' : '0 0 5px #ff9500';
+    }
+    window.addEventListener('scroll', updateReadingProgress);
+    window.addEventListener('resize', updateReadingProgress);
+    updateReadingProgress();
+
     // Keyboard navigation: Backspace or Escape to go back
     document.addEventListener('keydown', (e) => {
       // Only trigger if not typing in an input field
@@ -149,5 +166,16 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-solidity.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-rust.min.js"></script>
+  <!-- Keccak hash -->
+  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.3/src/sha3.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const article = document.querySelector('article');
+      const text = article.innerText;
+      const fullHash = keccak256(text);
+      const hash = '0x' + fullHash.substring(0, 8) + '...' + fullHash.substring(56);
+      document.getElementById('content-hash').textContent = hash;
+    });
+  </script>
 </body>
 </html>

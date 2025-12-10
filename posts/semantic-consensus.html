@@ -32,12 +32,12 @@
     <article>
       <div class="post-header">
         <h1>The Challenges of Semantic Consensus</h1>
-        <p class="meta">2025-12-09 // Consensus, Condorcet, Verification</p>
+        <p class="meta">2025-12-09 // <span id="content-hash">0x...</span> // Consensus, Condorcet, Verification, GenLayer</p>
       </div>
 
       <p><em>How to convert subjective interpretations into executable truth.</em></p>
 
-      <p>In the previous post, we argued that objectivity is an asymptote, not a binary state. We established a verification spectrum with four levels, from logical axioms to pure opinions. And we positioned GenLayer at Level 2: empirical induction, where evidence exists but requires interpretation.</p>
+      <p>In the <a href="illusion-of-determinism.html">previous post</a>, we argued that objectivity is an asymptote, not a binary state. We established a verification spectrum with four levels, from logical axioms to pure opinions. And we positioned GenLayer at Level 2: empirical induction, where evidence exists but requires interpretation.</p>
 
       <p>Now comes the hard question: how do we make that work?</p>
 
@@ -63,7 +63,7 @@
 
       <p>Let $n$ be the number of jurors. Let $p$ be the probability that an individual juror reaches the correct conclusion. If we assume that $p > 0.5$ — that is, the juror is minimally competent, better than chance — then the probability that the group majority gets it right grows with the group size. And it doesn't just grow: it converges to 1.</p>
 
-      <p>In GenLayer, we don't need infinite validators. We need a BFT security threshold (at least $3f+1$ nodes to tolerate $f$ malicious nodes). What the theorem tells us is that, under these conditions, the probability of error becomes negligible.</p>
+      <p>In GenLayer, we don't need infinite validators. We need a BFT security threshold (at least $2f+1$ nodes to tolerate $f$ malicious nodes). What the theorem tells us is that, under these conditions, the probability of error becomes negligible.</p>
 
       <p>We accept a transaction as "correct" when the probability that the consensus is wrong is so low that ignoring it is rational.</p>
 
@@ -157,12 +157,12 @@
         Ethereum tells you if the code executed correctly. GenLayer tells you if the world is as you believe it to be.
       </blockquote>
 
-      <div class="signature">JM // GenLayer</div>
+      <div class="signature">JM</div>
     </article>
   </div>
 
   <div class="status-bar">
-    <span>SYSTEM STATUS: ONLINE // TYPE 'help' FOR COMMANDS.</span>
+    <span id="reading-progress">READING: 0% COMPLETE</span>
     <div>
       <a href="https://github.com/jmlago">GitHub</a>
       <a href="https://x.com/josemlago">X</a>
@@ -170,6 +170,23 @@
   </div>
 
   <script>
+    // Reading progress tracker
+    let maxProgress = 0;
+    function updateReadingProgress() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrolled = window.scrollY;
+      const currentProgress = documentHeight > 0 ? Math.min(100, Math.round((scrolled / documentHeight) * 100)) : 0;
+      maxProgress = Math.max(maxProgress, currentProgress);
+      const el = document.getElementById('reading-progress');
+      el.textContent = 'READING 002_SEMANTIC_CONSENSUS.log // ' + maxProgress + '% COMPLETE';
+      el.style.color = maxProgress >= 100 ? 'var(--green)' : '#ff9500';
+      el.style.textShadow = maxProgress >= 100 ? '0 0 5px var(--green)' : '0 0 5px #ff9500';
+    }
+    window.addEventListener('scroll', updateReadingProgress);
+    window.addEventListener('resize', updateReadingProgress);
+    updateReadingProgress();
+
     // Keyboard navigation: Backspace or Escape to go back
     document.addEventListener('keydown', (e) => {
       // Only trigger if not typing in an input field
@@ -213,5 +230,16 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-solidity.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-rust.min.js"></script>
+  <!-- Keccak hash -->
+  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.3/src/sha3.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const article = document.querySelector('article');
+      const text = article.innerText;
+      const fullHash = keccak256(text);
+      const hash = '0x' + fullHash.substring(0, 8) + '...' + fullHash.substring(56);
+      document.getElementById('content-hash').textContent = hash;
+    });
+  </script>
 </body>
 </html>
