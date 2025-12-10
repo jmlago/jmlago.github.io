@@ -31,7 +31,7 @@
 
     <article>
       <div class="post-header">
-        <h1>The Challenges of Semantic Consensus</h1>
+        <h1>002 The Challenges of Semantic Consensus</h1>
         <p class="meta">2025-12-09 // <span id="content-hash">0x...</span> // Consensus, Condorcet, Verification, GenLayer</p>
       </div>
 
@@ -45,17 +45,17 @@
 
       <p>This post is the technical answer to those questions.</p>
 
-      <h2>The Thesis: Convergence, Not Determinism</h2>
+      <h2>The Thesis: Convergence + Determinism</h2>
 
-      <p>GenLayer proposes a paradigm shift. <strong>Correctness in an open environment is not determinism — it's convergence.</strong></p>
+      <p>GenLayer doesn't replace determinism — it extends it. <strong>Everything that works in traditional blockchains still works exactly the same way.</strong> Hashes, signatures, deterministic state transitions — all of that remains unchanged.</p>
 
-      <p>A transaction is not valid because it satisfies a pre-programmed logical condition. It's valid when an intersubjective consensus is reached under Byzantine fault tolerance constraints.</p>
+      <p>What GenLayer adds is a new layer: the ability to reach consensus on things that can't be computed deterministically. When a transaction requires interpreting an image, parsing a webpage, or evaluating a subjective condition, GenLayer uses convergence to establish truth.</p>
 
       <p>Think of an evaluation function executed by an intelligent agent. The input can be subjective — an image, a text, a real-world condition. We know the function is not deterministic: two executions of the same model with the same input can produce slightly different results.</p>
 
       <p>However, we postulate that there exists a "consensus truth" towards which a qualified majority of honest agents converges. As we increase the number of validators, the probability that the group reaches that truth tends to 1.</p>
 
-      <p>This is not an opinion. It's a stochastic approximation to truth.</p>
+      <p>This is not an opinion. It's a stochastic approximation to truth — stacked on top of the deterministic foundation that already exists.</p>
 
       <h2>The Jury Theorem</h2>
 
@@ -69,7 +69,7 @@
 
       <h2>Precedents: This Is Not New</h2>
 
-      <p>The resistance to accepting subjective consensus as truth in computation ignores something fundamental: all of humanity's great truth systems operate under this principle. Absolute certainty is an illusion reserved for pure mathematics. The rest is consensus.</p>
+      <p>The resistance to accepting subjective consensus as truth in computation ignores something fundamental: all of humanity's great truth systems operate under this principle. Absolute certainty is an illusion reserved for pure logic axioms. The rest is consensus.</p>
 
       <p><strong>The scientific method.</strong> Science doesn't produce absolute truths — it produces models that resist falsifiability. How do we confirm a discovery? Through replicability. But no experiment can be replicated exactly: time is unidirectional, initial conditions change. What we accept as scientific truth is the community's consensus through peer review. A qualified majority of experts observing data and agreeing on an interpretation.</p>
 
@@ -91,9 +91,9 @@
 
       <p><strong>The solution: induced cognitive diversity.</strong></p>
 
-      <p>We don't mitigate error correlation only through stochastic entropy (different random seeds). That helps avoid deterministic responses, but if the model has a fundamental bias in its weights, the seed won't fix it.</p>
+      <p>We don't mitigate error correlation only through stochastic entropy (<a href="https://github.com/genlayerlabs/genvm/blob/b22bc5c80bef593fd906ed3bcc8b152364adb559/modules/install/config/genvm-llm-default.lua#L84">different random seeds</a> - see also <a href="https://sdk.genlayer.com/main/impl-spec/01-core-architecture/03-modules.html">modules architecture</a>). That helps avoid deterministic responses, but if the model has a fundamental bias in its weights, the seed won't fix it.</p>
 
-      <p>What does work is forcing divergent reasoning paths. The protocol can inject variations in system prompts under the principle of semantic equivalence. One validator might receive the instruction to "analyze this as a skeptical lawyer." Another, "evaluate this as an investigative journalist." A third, "think like a financial auditor."</p>
+      <p>What does work is forcing divergent reasoning paths. The protocol can inject variations in system prompts under the principle of semantic equivalence. One validator might receive the instruction (through an <a href="https://sdk.genlayer.com/main/api/genlayer.html#module-genlayer.gl.eq_principle">equivalence principle defined in a contract</a>) to "analyze this as a well known skeptical lawyer." Another, "evaluate this as an investigative journalist of your choice." A third, "think like a financial auditor [from, this, predefined, list]."</p>
 
       <p>They're the same base model, but traversing different inference graphs. If models traveling different logical paths arrive at the same semantic conclusion, the probability of it being a shared hallucination drops dramatically.</p>
 
@@ -113,7 +113,7 @@
 
       <p>What's your only clue to coordinate? The external reality you all share: the photo of the dog.</p>
 
-      <p>In the absence of social signals, the truth — or the most obvious interpretation of reality — is the only available Schelling point. It's where rational agents converge when they cannot communicate.</p>
+      <p>In the absence of social signals, there are two natural Schelling points: the truth, or saying nothing (timing out). The fee system removes the second option — validators must participate to earn rewards and avoid penalties. This leaves the truth as the only viable coordination point. (We'll expand on the incentive mechanics in future posts.)</p>
 
       <p>If the dog is black, the most rational choice to try to match strangers is to vote "black." Voting "blue" requires assuming that everyone else has secretly agreed to vote "blue," a very high-risk bet when slashing penalizes dissenters.</p>
 
@@ -121,7 +121,7 @@
 
       <h3>3. The Security Problem</h3>
 
-      <p>The third threat is technical: <strong>universal adversarial attacks</strong>.</p>
+      <p>The third threat is technical: <strong><a href="https://arxiv.org/pdf/2307.15043">universal adversarial attacks</a></strong>.</p>
 
       <p>An attacker could, theoretically, optimize a character string that, when concatenated with any input, forces the model to break its restrictions and produce a malicious result. These attacks exist in the LLM security literature.</p>
 
