@@ -53,19 +53,23 @@
 
       <p>Think of an evaluation function executed by an intelligent agent. The input can be subjective — an image, a text, a real-world condition. We know the function is not deterministic: two executions of the same model with the same input can produce slightly different results.</p>
 
-      <p>However, we postulate that there exists a "consensus truth" towards which a qualified majority of honest agents converges. As we increase the number of validators, the probability that the group reaches that truth tends to 1.</p>
+      <p>However, we can prove that as we increase the number of validators, the system converges to a stable <em>limit decision</em> $D_\infty$ — the majority view of the validator population. As the number of validators grows, the probability that the group decision matches $D_\infty$ tends to 1 exponentially fast.</p>
 
-      <p>This is not an opinion. It's a stochastic approximation to truth — stacked on top of the deterministic foundation that already exists.</p>
+      <p>A key distinction: we're not claiming convergence to external "truth," but to <strong>coordinated consensus</strong>. Whether that consensus matches reality depends on the validator population. The mathematics guarantees coordination; the population determines what that coordination means.</p>
+
+      <p>This is not philosophy. It's a stochastic aggregation mechanism — stacked on top of the deterministic foundation that already exists.</p>
 
       <h2>The Jury Theorem</h2>
 
       <p>The mathematical justification comes from 1785. The Marquis de Condorcet proved something counterintuitive about group decisions.</p>
 
-      <p>Let $n$ be the number of jurors. Let $p$ be the probability that an individual juror reaches the correct conclusion. If we assume that $p > 0.5$ — that is, the juror is minimally competent, better than chance — then the probability that the group majority gets it right grows with the group size. And it doesn't just grow: it converges to 1.</p>
+      <p>Let $n$ be the number of validators. Let $p$ be the probability that an individual validator votes with the eventual majority — the <em>limit decision</em> $D_\infty$ that emerges as $n \to \infty$. If $p > 0.5$, the probability that the group reaches this limit decision grows with the group size. And it doesn't just grow: it converges to 1 exponentially fast.</p>
 
-      <p>In GenLayer, we don't need infinite validators. We need a BFT security threshold (at least $2f+1$ nodes to tolerate $f$ malicious nodes). What the theorem tells us is that, under these conditions, the probability of error becomes negligible.</p>
+      <p>A crucial nuance: this $p$ is <strong>not</strong> the probability of being "objectively correct" in some external sense. It measures coherence — how likely a validator is to agree with the eventual consensus. The system converges to the majority view of its population, not to any pre-defined truth. Whether that consensus matches external reality depends on the validator population itself.</p>
 
-      <p>We accept a transaction as "correct" when the probability that the consensus is wrong is so low that ignoring it is rational.</p>
+      <p>In GenLayer, with adversarial fraction $\alpha$ (the proportion of malicious validators), the required accuracy is $p \geq \frac{1}{2(1-\alpha)}$. For 10% adversaries, you need $p > 0.556$. For 30% adversaries, $p > 0.714$. The probability of error then becomes negligible — exponentially small in the number of validators.</p>
+
+      <p>We accept a transaction as "final" when the probability that more validators would change the consensus is so low that ignoring it is rational.</p>
 
       <h2>Precedents: This Is Not New</h2>
 
@@ -87,15 +91,21 @@
 
       <p>Condorcet's Theorem assumes jurors are independent. If everyone copies from the same exam, it doesn't matter how many there are — the error propagates.</p>
 
-      <p>In GenLayer, if all validators use the same model with the same parameters, aren't we just amplifying the same bias? A model trained on biased data will produce biased responses. Adding more nodes running the same model doesn't fix the problem.</p>
+      <p>In GenLayer, if all validators use the same model with the same parameters, aren't we just amplifying the same bias? This objection seems intuitive, but it conflates two distinct issues: <strong>statistical independence</strong> and <strong>systematic bias</strong>.</p>
 
-      <p><strong>The solution: induced cognitive diversity.</strong></p>
+      <p><strong>Independence: solved by random seeds.</strong></p>
 
-      <p>We don't mitigate error correlation only through stochastic entropy (<a href="https://github.com/genlayerlabs/genvm/blob/b22bc5c80bef593fd906ed3bcc8b152364adb559/modules/install/config/genvm-llm-default.lua#L84">different random seeds</a> - see also <a href="https://sdk.genlayer.com/main/impl-spec/01-core-architecture/03-modules.html">modules architecture</a>). That helps avoid deterministic responses, but if the model has a fundamental bias in its weights, the seed won't fix it.</p>
+      <p>Here's a counterintuitive result from our formal analysis: validators using the same LLM with <a href="https://github.com/genlayerlabs/genvm/blob/b22bc5c80bef593fd906ed3bcc8b152364adb559/modules/install/config/genvm-llm-default.lua#L84">independent random seeds</a> produce <strong>statistically independent votes</strong>. Same model, same weights, same training data — but mathematically independent outputs.</p>
 
-      <p>What does work is forcing divergent reasoning paths. The protocol can inject variations in system prompts under the principle of semantic equivalence. One validator might receive the instruction (through an <a href="https://sdk.genlayer.com/main/api/genlayer.html#module-genlayer.gl.eq_principle">equivalence principle defined in a contract</a>) to "analyze this as a well known skeptical lawyer." Another, "evaluate this as an investigative journalist of your choice." A third, "think like a financial auditor [from, this, predefined, list]."</p>
+      <p>Why? Because independence comes from the execution randomness (the seed), not from the model architecture. Think of it like rolling the same die twice: the die's bias affects the probability distribution, but the rolls are independent events. Using the same LLM affects the <em>marginal distribution</em> of each vote (they have the same $p$), but does not introduce <em>statistical dependence</em> between votes.</p>
 
-      <p>They're the same base model, but traversing different inference graphs. If models traveling different logical paths arrive at the same semantic conclusion, the probability of it being a shared hallucination drops dramatically.</p>
+      <p><strong>Systematic bias: a separate concern.</strong></p>
+
+      <p>Statistical independence doesn't mean validators are right. If all validators use the same model, they may independently converge to a biased $D_\infty$. This is where <strong>cognitive diversity</strong> helps — not for achieving independence (seeds handle that), but for improving <em>what</em> the population converges to.</p>
+
+      <p>The protocol can inject variations in system prompts under the principle of semantic equivalence. One validator might receive the instruction (through an <a href="https://sdk.genlayer.com/main/api/genlayer.html#module-genlayer.gl.eq_principle">equivalence principle defined in a contract</a>) to "analyze this as a well known skeptical lawyer." Another, "evaluate this as an investigative journalist of your choice." A third, "think like a financial auditor [from, this, predefined, list]." (See also <a href="https://sdk.genlayer.com/main/impl-spec/01-core-architecture/03-modules.html">modules architecture</a>.)</p>
+
+      <p>If models traveling different logical paths arrive at the same semantic conclusion, we have stronger evidence that the consensus reflects robust interpretation rather than a shared blind spot.</p>
 
       <h3>2. The Incentives Problem</h3>
 
@@ -135,13 +145,13 @@
 
       <p>The attacker faces a moving target. Pre-computing a guaranteed universal attack becomes impossible.</p>
 
-      <h2>The Tripod of Truth</h2>
+      <h2>The Tripod of Consensus</h2>
 
-      <p>With these three mechanisms, GenLayer builds what we could call a <strong>robust truth architecture</strong>:</p>
+      <p>With these three mechanisms, GenLayer builds what we could call a <strong>robust consensus architecture</strong>:</p>
 
-      <p><strong>Against collusion: commit-reveal.</strong> Temporal blindness turns truth into the only rational Schelling point.</p>
+      <p><strong>Against collusion: commit-reveal.</strong> Temporal blindness turns the consensus target into the only rational Schelling point.</p>
 
-      <p><strong>Against systemic bias: cognitive variance.</strong> Different seeds and roles force independent inference paths, validating the Jury Theorem's assumptions.</p>
+      <p><strong>For statistical validity: random seeds.</strong> Independent seeds guarantee that validators produce independent votes — satisfying the Jury Theorem's assumptions. <strong>Cognitive variance</strong> (different prompts and roles) addresses a separate concern: reducing systematic bias in <em>what</em> the population converges to.</p>
 
       <p><strong>Against semantic hacking: stochastic greyboxing.</strong> Parametric randomness makes universal attack generation computationally infeasible.</p>
 
@@ -151,10 +161,12 @@
 
       <p>By adopting this model, we're not reducing blockchain security. We're expanding its ontological domain. We allow the machine to compute not just syntax, but reality.</p>
 
-      <p>Correctness in GenLayer is the recognition that, in an entropic and complex universe, the only functional approximation to objective truth is cryptographically secured subjective consensus.</p>
+      <p>Correctness in GenLayer is the recognition that, in an entropic and complex universe, the only functional approximation to coordinated truth is cryptographically secured stochastic consensus.</p>
+
+      <p><em>A final clarification on what "truth" means here: the system converges to the majority view of its validator population. Whether this matches some external notion of truth depends on whether the population is representative of "reasonable interpretation." The mathematics guarantees convergence and coordination — the choice of validator population determines what that convergence means.</em></p>
 
       <blockquote>
-        Ethereum tells you if the code executed correctly. GenLayer tells you if the world is as you believe it to be.
+        Ethereum tells you if the code executed correctly. GenLayer tells you what the validator population agrees the world is.
       </blockquote>
 
       <div class="signature">JM</div>
