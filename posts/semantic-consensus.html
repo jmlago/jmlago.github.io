@@ -127,7 +127,17 @@
 
       <p>If the dog is black, the most rational choice to try to match strangers is to vote "black." Voting "blue" requires assuming that everyone else has secretly agreed to vote "blue," a very high-risk bet when slashing penalizes dissenters.</p>
 
-      <p>Commit-reveal turns truth into the dominant Nash strategy.</p>
+      <p>Commit-reveal turns the consensus target into the dominant Nash strategy.</p>
+
+      <p><strong>But is commit-reveal enough?</strong></p>
+
+      <p>A skeptic might argue: what if validators find ways to collude anyway? Three factors make this extremely difficult:</p>
+
+      <p><strong>Time constraints.</strong> Validators have very short windows to commit their votes. Coordinating a collusion scheme among anonymous parties in real-time, without knowing who else is in the committee, is operationally impractical.</p>
+
+      <p><strong>Appeal escalation.</strong> Even if a small committee colludes, anyone can appeal the decision. Appeals trigger larger committees, eventually escalating to the full validator set. A collusion that works at 5 validators must scale to 1000 — exponentially harder.</p>
+
+      <p><strong>The 51% assumption.</strong> If colluding validators control more than half the total stake, they can manipulate the system. But this is the same security assumption underlying every proof-of-stake network. If 51% of Ethereum's validators collude, Ethereum breaks too. GenLayer doesn't introduce a new trust assumption — it operates under the same one.</p>
 
       <h3>3. The Security Problem</h3>
 
