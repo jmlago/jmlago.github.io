@@ -165,6 +165,11 @@
       { file: '002_SEMANTIC_CONSENSUS.log', url: 'posts/semantic-consensus.html', date: '2025-12-09', size: '14K', title: 'The Challenges of Semantic Consensus', excerpt: 'How to convert subjective interpretations into executable truth.' },
     ];
 
+    // Claude Code skills data
+    const skills = [
+      { file: 'DEBUG_TUIS_TMUX.skill', url: 'skills/debug-tuis-with-tmux.html', size: '8K', title: 'Debug TUIs with tmux', excerpt: 'Use tmux to visualize and interact with TUIs like nvim, lazygit, debuggers, and REPLs.' },
+    ];
+
     const output = document.getElementById('terminal-output');
     const input = document.getElementById('terminal-input');
     let commandHistory = [];
@@ -191,13 +196,26 @@
       output.appendChild(entry);
     }
 
+    // Add clickable skill
+    function addClickableSkill(skill) {
+      const entry = document.createElement('div');
+      entry.className = 'file-entry';
+      entry.innerHTML = `
+        <span class="file-size">${skill.size}</span>
+        <span class="file-name" onclick="window.location.href='${skill.url}'">${skill.file}</span>
+      `;
+      output.appendChild(entry);
+    }
+
     // Commands
     const commands = {
       help: () => {
         addLine('Available commands:', 'result');
         addLine('  ls [-la]          List blog posts', 'result');
-        addLine('  cat &lt;file&gt;        Read a post', 'result');
-        addLine('  cd &lt;file&gt;         Open a post', 'result');
+        addLine('  ls skills         List Claude Code skills', 'result');
+        addLine('  skills            List Claude Code skills', 'result');
+        addLine('  cat &lt;file&gt;        Preview a post or skill', 'result');
+        addLine('  cd &lt;file&gt;         Open a post or skill', 'result');
         addLine('  clear             Clear terminal', 'result');
         addLine('  whoami            About the author', 'result');
         addLine('  neofetch          System info', 'result');
@@ -209,7 +227,13 @@
 
       ls: (args) => {
         const showDetails = args.includes('-l') || args.includes('-la') || args.includes('-al');
-        if (showDetails) {
+        const showSkills = args.includes('skills');
+
+        if (showSkills) {
+          addLine('skills/', 'result');
+          addLine('total ' + skills.length, 'result');
+          skills.forEach(addClickableSkill);
+        } else if (showDetails) {
           addLine('total ' + posts.length, 'result');
           posts.forEach(addClickableFile);
         } else {
@@ -229,7 +253,8 @@
           addLine('Usage: cat &lt;filename&gt;', 'result');
           return;
         }
-        const post = posts.find(p => 
+        // Check posts first
+        const post = posts.find(p =>
           p.file.toLowerCase() === filename.toLowerCase() ||
           p.file.toLowerCase().startsWith(filename.toLowerCase())
         );
@@ -242,11 +267,27 @@
           addLine(post.excerpt, 'result');
           addLine('', 'result');
           addLine(`<span class="clickable" onclick="window.location.href='${post.url}'">[Press ENTER or click to read full post...]</span>`, 'result');
-          // Store current post for enter key
           window.currentPost = post;
-        } else {
-          addLine(`cat: ${filename}: No such file`, 'error');
+          return;
         }
+        // Check skills
+        const skill = skills.find(s =>
+          s.file.toLowerCase() === filename.toLowerCase() ||
+          s.file.toLowerCase().startsWith(filename.toLowerCase())
+        );
+        if (skill) {
+          addLine(`=== ${skill.file} ===`, 'result');
+          addLine('', 'result');
+          addLine(`<strong>${skill.title}</strong>`, 'result');
+          addLine('Type: Claude Code Skill', 'result');
+          addLine('', 'result');
+          addLine(skill.excerpt, 'result');
+          addLine('', 'result');
+          addLine(`<span class="clickable" onclick="window.location.href='${skill.url}'">[Press ENTER or click to view skill...]</span>`, 'result');
+          window.currentPost = skill;
+          return;
+        }
+        addLine(`cat: ${filename}: No such file`, 'error');
       },
 
       cd: (args) => {
@@ -259,16 +300,31 @@
           addLine('Already at root', 'result');
           return;
         }
-        const post = posts.find(p => 
+        if (filename === 'skills') {
+          commands.skills();
+          return;
+        }
+        // Check posts first
+        const post = posts.find(p =>
           p.file.toLowerCase() === filename.toLowerCase() ||
           p.file.toLowerCase().startsWith(filename.toLowerCase())
         );
         if (post) {
           addLine(`Opening ${post.file}...`, 'result');
           setTimeout(() => window.location.href = post.url, 500);
-        } else {
-          addLine(`cd: ${filename}: No such file or directory`, 'error');
+          return;
         }
+        // Check skills
+        const skill = skills.find(s =>
+          s.file.toLowerCase() === filename.toLowerCase() ||
+          s.file.toLowerCase().startsWith(filename.toLowerCase())
+        );
+        if (skill) {
+          addLine(`Opening ${skill.file}...`, 'result');
+          setTimeout(() => window.location.href = skill.url, 500);
+          return;
+        }
+        addLine(`cd: ${filename}: No such file or directory`, 'error');
       },
 
       clear: () => {
@@ -369,6 +425,14 @@
         } catch (err) {
           addLine('Error downloading posts: ' + err.message, 'error');
         }
+      },
+
+      skills: () => {
+        addLine('Claude Code Skills', 'result');
+        addLine('Downloadable .md files for Claude Code', 'result');
+        addLine('', 'result');
+        addLine('total ' + skills.length, 'result');
+        skills.forEach(addClickableSkill);
       }
     };
 
