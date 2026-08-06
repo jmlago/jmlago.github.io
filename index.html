@@ -1,544 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JM BLOG</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Essays in Orkish Thomism: decision, information, play, and consensus.">
+  <meta name="theme-color" content="#ffffff">
+  <title>JM Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <meta name="description" content="Here the reader can find some of my thoughts.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬤</text></svg>">
-  <style>
-    .terminal-output {
-      margin-bottom: 10px;
-    }
-    .terminal-output .line {
-      margin: 2px 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .terminal-output .cmd {
-      color: var(--green-dim);
-    }
-    .terminal-output .cmd::before {
-      content: "> ";
-      color: var(--green);
-    }
-    .terminal-output .result {
-      color: var(--green);
-      padding-left: 0;
-    }
-    .terminal-output .error {
-      color: #ff4040;
-    }
-    .terminal-output .clickable {
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-    .terminal-output .clickable:hover {
-      text-shadow: 0 0 10px var(--green);
-    }
-    .input-line {
-      display: flex;
-      align-items: center;
-      margin-top: 20px;
-    }
-    .input-line::before {
-      content: "> ";
-      color: var(--green);
-    }
-    .input-wrapper {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-    }
-    #terminal-input {
-      background: transparent;
-      border: none;
-      color: var(--green);
-      font-family: inherit;
-      font-size: inherit;
-      outline: none;
-      caret-color: transparent;
-      width: auto;
-      min-width: 1px;
-    }
-    #terminal-input::selection {
-      background: var(--green);
-      color: var(--black);
-    }
-    .block-cursor {
-      display: inline-block;
-      width: 10px;
-      height: 1.2em;
-      background: var(--green);
-      vertical-align: text-bottom;
-      animation: blink 1s step-end infinite;
-      box-shadow: 0 0 10px var(--green), 0 0 20px rgba(0, 255, 65, 0.5);
-      margin-left: 1px;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-    .file-list {
-      display: block;
-    }
-    .file-entry {
-      display: flex;
-      gap: 15px;
-      padding: 5px 10px;
-      border-left: 2px solid transparent;
-      transition: all 0.1s ease;
-    }
-    .file-entry:hover {
-      background: rgba(0, 255, 65, 0.08);
-      border-left: 2px solid var(--green);
-    }
-    .file-entry:hover .file-name {
-      text-shadow: 0 0 15px var(--green), 0 0 30px rgba(0, 255, 65, 0.5);
-    }
-    .file-entry:hover .file-date,
-    .file-entry:hover .file-size {
-      color: var(--green);
-    }
-    .file-date { color: var(--green-dim); min-width: 90px; }
-    .file-size { color: var(--green-dim); min-width: 60px; text-align: right; }
-    .file-name { color: var(--green); cursor: pointer; }
-    .file-name:hover { text-shadow: 0 0 10px var(--green); }
-    .neofetch {
-      display: flex;
-      gap: 30px;
-      flex-wrap: wrap;
-    }
-    .neofetch-logo {
-      color: var(--green);
-      text-shadow: 0 0 10px var(--green);
-      font-size: 10px;
-      line-height: 11px;
-    }
-    .neofetch-info {
-      color: var(--green);
-    }
-    .neofetch-info .label {
-      color: var(--green-dim);
-    }
-  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❧</text></svg>">
 </head>
 <body>
-  <div class="right-glow"></div>
+  <a class="skip-link" href="#essays">Skip to essays</a>
 
-  <div class="container">
-    <!-- ASCII Art Title -->
-    <pre class="ascii-title">
-       ██╗███╗   ███╗    ██████╗ ██╗      ██████╗  ██████╗ 
-       ██║████╗ ████║    ██╔══██╗██║     ██╔═══██╗██╔════╝ 
-       ██║██╔████╔██║    ██████╔╝██║     ██║   ██║██║  ███╗
-  ██   ██║██║╚██╔╝██║    ██╔══██╗██║     ██║   ██║██║   ██║
-  ╚█████╔╝██║ ╚═╝ ██║    ██████╔╝███████╗╚██████╔╝╚██████╔╝
-   ╚════╝ ╚═╝     ╚═╝    ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝ 
-    </pre>
-
-    <!-- Terminal output area -->
-    <div id="terminal-output" class="terminal-output"></div>
-
-    <!-- Input line -->
-    <div class="input-line">
-      <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false">
-      <span class="block-cursor"></span>
+  <header class="masthead">
+    <div class="wrap">
+      <h1 class="site-title"><span class="versal">J</span>M Blog</h1>
+      <p class="tagline">decision · information · play · consensus</p>
     </div>
-  </div>
+  </header>
 
-  <!-- Status bar -->
-  <div class="status-bar">
-    <span>// TYPE 'help' FOR COMMANDS.</span>
-    <div>
-      <a href="https://github.com/jmlago">GitHub</a>
-      <a href="https://x.com/josemlago">X</a>
+  <main>
+    <figure class="orbit-hero" aria-labelledby="orbit-caption">
+      <canvas id="orbits" width="900" height="430" role="img" aria-label="Concepts orbiting a core of green light">
+        Decision, information, consensus, and other concepts orbit a common center.
+      </canvas>
+      <figcaption class="orbit-caption" id="orbit-caption"><span class="k">fig. i</span> — concepts in orbit around the keystone <em>(revelation pending)</em></figcaption>
+    </figure>
+
+    <div class="catalog" id="essays">
+      <div class="wrap">
+        <section class="section" aria-labelledby="essays-heading">
+          <div class="section-heading">
+            <h2 id="essays-heading">Essays</h2>
+            <div class="rule" aria-hidden="true"></div>
+            <span class="ornament" aria-hidden="true">❧</span>
+          </div>
+
+          <article class="essay-entry">
+            <div class="essay-number">01</div>
+            <div>
+              <h3 class="essay-title"><a href="posts/illusion-of-determinism.html"><span class="init">T</span>he Illusion of Determinism</a></h3>
+              <p class="abstract">Ethereum isn't objective. ZK proofs aren't objective. Even mathematics rests on consensus. All institutional truth is agreement — the question is which agreements we can reach.</p>
+              <p class="entry-meta">published · consensus &amp; metaphysics</p>
+            </div>
+          </article>
+
+          <article class="essay-entry">
+            <div class="essay-number">02</div>
+            <div>
+              <h3 class="essay-title"><a href="posts/semantic-consensus.html"><span class="init">T</span>he Challenges of Semantic Consensus</a></h3>
+              <p class="abstract">Condorcet, commit-reveal, and stochastic greyboxing: how to decide collectively when two honest judges can read the same text and not read the same thing.</p>
+              <p class="entry-meta">published · mechanism &amp; aggregation</p>
+            </div>
+          </article>
+
+        </section>
+
+        <section class="section" aria-labelledby="notes-heading">
+          <div class="section-heading">
+            <h2 id="notes-heading">Notes</h2>
+            <div class="rule" aria-hidden="true"></div>
+            <span class="ornament" aria-hidden="true">❧</span>
+          </div>
+
+          <article class="essay-entry">
+            <div class="essay-number">01</div>
+            <div>
+              <h3 class="essay-title"><a href="skills/tmux-multi-agent-orchestrator.html"><span class="init">A</span> Stupidly Simple Multi-Agent Orchestrator with tmux</a></h3>
+              <p class="abstract">One supervisor, two heterogeneous workers, and a handful of tmux commands. Agents are processes; perhaps orchestration can stay that simple.</p>
+              <p class="entry-meta">published · agents &amp; tooling</p>
+            </div>
+          </article>
+        </section>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="colophon">Essays as orbits: each one another pass around a center not yet revealed. The stones are good; when the time comes, they will fit.</p>
+      <div class="footer-links">
+        <a href="https://github.com/jmlago" rel="me">GitHub</a>
+        <a href="https://x.com/josemlago" rel="me">X</a>
+        <a href="https://genlayer.com">GenLayer</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    // Blog posts data
-    const posts = [
-      { file: '001_ILLUSION_DETERMINISM.log', url: 'posts/illusion-of-determinism.html', date: '2025-12-09', size: '9K', title: 'The Illusion of Determinism', excerpt: 'Why all blockchain truth is subjective — and why that\'s okay.' },
-      { file: '002_SEMANTIC_CONSENSUS.log', url: 'posts/semantic-consensus.html', date: '2025-12-09', size: '14K', title: 'The Challenges of Semantic Consensus', excerpt: 'How to convert subjective interpretations into executable truth.' },
+  "use strict";
+  (() => {
+    const canvas = document.getElementById("orbits");
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const orbitSpeed = 0.35;
+    const concepts = [
+      { text: "THOMISM", a: 0.92, b: 0.30, tilt: -0.10, speed: 0.00050, phase: 0.4 },
+      { text: "DECISION", a: 0.92, b: 0.30, tilt: -0.10, speed: 0.00050, phase: 2.6 },
+      { text: "GAME THEORY", a: 0.92, b: 0.30, tilt: -0.10, speed: 0.00050, phase: 4.6 },
+      { text: "INFORMATION", a: 0.72, b: 0.38, tilt: 0.35, speed: 0.00066, phase: 1.2 },
+      { text: "CONSENSUS", a: 0.72, b: 0.38, tilt: 0.35, speed: 0.00066, phase: 3.3 },
+      { text: "MEMETICS", a: 0.72, b: 0.38, tilt: 0.35, speed: 0.00066, phase: 5.3 },
+      { text: "ENTROPY", a: 0.55, b: 0.20, tilt: -0.55, speed: 0.00088, phase: 0.9 },
+      { text: "HABITUS", a: 0.55, b: 0.20, tilt: -0.55, speed: 0.00088, phase: 3.0 },
+      { text: "MULTI-AGENT", a: 0.55, b: 0.20, tilt: -0.55, speed: 0.00088, phase: 5.1 },
+      { text: "CLARITY", a: 0.38, b: 0.26, tilt: 0.85, speed: 0.00115, phase: 1.8 },
+      { text: "GRATUITAS", a: 0.38, b: 0.26, tilt: 0.85, speed: 0.00115, phase: 4.0 },
+      { text: "WAAAGH", a: 0.24, b: 0.10, tilt: -0.25, speed: 0.00150, phase: 2.2 }
+    ];
+    const rings = [
+      { a: 0.92, b: 0.30, tilt: -0.10 },
+      { a: 0.72, b: 0.38, tilt: 0.35 },
+      { a: 0.55, b: 0.20, tilt: -0.55 },
+      { a: 0.38, b: 0.26, tilt: 0.85 },
+      { a: 0.24, b: 0.10, tilt: -0.25 }
     ];
 
-    // Claude Code skills data
-    const skills = [
-      { file: 'DEBUG_TUIS_TMUX.skill', url: 'skills/debug-tuis-with-tmux.html', size: '8K', title: 'Debug TUIs with tmux', excerpt: 'Use tmux to visualize and interact with TUIs like nvim, lazygit, debuggers, and REPLs.' },
-    ];
+    let width;
+    let height;
+    let centerX;
+    let centerY;
+    let radius;
+    let animationFrame = 0;
+    let resizeFrame = 0;
 
-    const output = document.getElementById('terminal-output');
-    const input = document.getElementById('terminal-input');
-    let commandHistory = [];
-    let historyIndex = -1;
-
-    // Add line to output
-    function addLine(text, className = 'result') {
-      const line = document.createElement('div');
-      line.className = 'line ' + className;
-      line.innerHTML = text;
-      output.appendChild(line);
-      window.scrollTo(0, document.body.scrollHeight);
+    function resize() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      width = canvas.parentElement.clientWidth;
+      height = Math.max(300, Math.min(460, Math.round(width * 0.48)));
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      canvas.style.height = `${height}px`;
+      centerX = width / 2;
+      centerY = height / 2;
+      radius = Math.min(width * (width < 560 ? 0.36 : 0.46), height * 1.05);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
 
-    // Add clickable file
-    function addClickableFile(post) {
-      const entry = document.createElement('div');
-      entry.className = 'file-entry';
-      entry.innerHTML = `
-        <span class="file-date">${post.date}</span>
-        <span class="file-size">${post.size}</span>
-        <span class="file-name" onclick="window.location.href='${post.url}'">${post.file}</span>
-      `;
-      output.appendChild(entry);
+    function position(concept, time) {
+      const angle = concept.phase + time * concept.speed * orbitSpeed;
+      const x = Math.cos(angle) * concept.a * radius;
+      const y = Math.sin(angle) * concept.b * radius;
+      const cos = Math.cos(concept.tilt);
+      const sin = Math.sin(concept.tilt);
+      return {
+        x: centerX + x * cos - y * sin,
+        y: centerY + x * sin + y * cos,
+        depth: Math.sin(angle)
+      };
     }
 
-    // Add clickable skill
-    function addClickableSkill(skill) {
-      const entry = document.createElement('div');
-      entry.className = 'file-entry';
-      entry.innerHTML = `
-        <span class="file-size">${skill.size}</span>
-        <span class="file-name" onclick="window.location.href='${skill.url}'">${skill.file}</span>
-      `;
-      output.appendChild(entry);
+    function drawWord(item) {
+      const { concept, point } = item;
+      const typeScale = width < 560 ? 0.84 : 1;
+      const size = (13.5 + point.depth * 3.2) * typeScale;
+      const alpha = 0.34 + ((point.depth + 1) / 2) * 0.6;
+      const spacing = size * 0.10;
+      const characters = Array.from(concept.text);
+      context.font = `${size}px "EB Garamond", Georgia, serif`;
+      const widths = characters.map((character) => context.measureText(character).width);
+      const total = widths.reduce((sum, value) => sum + value, 0) + spacing * (characters.length - 1);
+
+      context.save();
+      context.translate(point.x, point.y);
+      context.fillStyle = `rgba(25, 24, 23, ${alpha.toFixed(3)})`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      let x = -total / 2;
+      characters.forEach((character, index) => {
+        context.fillText(character, x + widths[index] / 2, 0);
+        x += widths[index] + spacing;
+      });
+      context.restore();
     }
 
-    // Commands
-    const commands = {
-      help: () => {
-        addLine('Available commands:', 'result');
-        addLine('  ls [-la]          List blog posts', 'result');
-        addLine('  ls skills         List Claude Code skills', 'result');
-        addLine('  skills            List Claude Code skills', 'result');
-        addLine('  cat &lt;file&gt;        Preview a post or skill', 'result');
-        addLine('  cd &lt;file&gt;         Open a post or skill', 'result');
-        addLine('  clear             Clear terminal', 'result');
-        addLine('  whoami            About the author', 'result');
-        addLine('  neofetch          System info', 'result');
-        addLine('  history           Command history', 'result');
-        addLine('  download          Download all posts as .txt', 'result');
-        addLine('', 'result');
-        addLine('Tip: Click on any filename to open it', 'result');
-      },
+    function draw(time) {
+      context.clearRect(0, 0, width, height);
+      context.strokeStyle = "rgba(25, 24, 23, 0.07)";
+      context.lineWidth = 1;
 
-      ls: (args) => {
-        const showDetails = args.includes('-l') || args.includes('-la') || args.includes('-al');
-        const showSkills = args.includes('skills');
+      rings.forEach((ring) => {
+        context.save();
+        context.translate(centerX, centerY);
+        context.rotate(ring.tilt);
+        context.beginPath();
+        context.ellipse(0, 0, ring.a * radius, ring.b * radius, 0, 0, Math.PI * 2);
+        context.stroke();
+        context.restore();
+      });
 
-        if (showSkills) {
-          addLine('skills/', 'result');
-          addLine('total ' + skills.length, 'result');
-          skills.forEach(addClickableSkill);
-        } else if (showDetails) {
-          addLine('total ' + posts.length, 'result');
-          posts.forEach(addClickableFile);
-        } else {
-          posts.forEach(p => {
-            const span = document.createElement('div');
-            span.className = 'line result';
-            span.innerHTML = `<span class="file-name" onclick="window.location.href='${p.url}'">${p.file}</span>`;
-            output.appendChild(span);
-          });
-        }
-      },
+      const visibleConcepts = width < 560
+        ? concepts.filter((concept) => !["GAME THEORY", "MEMETICS", "MULTI-AGENT"].includes(concept.text))
+        : concepts;
+      const items = visibleConcepts
+        .map((concept) => ({ concept, point: position(concept, time) }))
+        .sort((left, right) => left.point.depth - right.point.depth);
 
-      cat: (args) => {
-        const filename = args[0];
-        if (!filename) {
-          addLine('cat: missing operand', 'error');
-          addLine('Usage: cat &lt;filename&gt;', 'result');
-          return;
-        }
-        // Check posts first
-        const post = posts.find(p =>
-          p.file.toLowerCase() === filename.toLowerCase() ||
-          p.file.toLowerCase().startsWith(filename.toLowerCase())
-        );
-        if (post) {
-          addLine(`=== ${post.file} ===`, 'result');
-          addLine('', 'result');
-          addLine(`<strong>${post.title}</strong>`, 'result');
-          addLine(`Date: ${post.date}`, 'result');
-          addLine('', 'result');
-          addLine(post.excerpt, 'result');
-          addLine('', 'result');
-          addLine(`<span class="clickable" onclick="window.location.href='${post.url}'">[Press ENTER or click to read full post...]</span>`, 'result');
-          window.currentPost = post;
-          return;
-        }
-        // Check skills
-        const skill = skills.find(s =>
-          s.file.toLowerCase() === filename.toLowerCase() ||
-          s.file.toLowerCase().startsWith(filename.toLowerCase())
-        );
-        if (skill) {
-          addLine(`=== ${skill.file} ===`, 'result');
-          addLine('', 'result');
-          addLine(`<strong>${skill.title}</strong>`, 'result');
-          addLine('Type: Claude Code Skill', 'result');
-          addLine('', 'result');
-          addLine(skill.excerpt, 'result');
-          addLine('', 'result');
-          addLine(`<span class="clickable" onclick="window.location.href='${skill.url}'">[Press ENTER or click to view skill...]</span>`, 'result');
-          window.currentPost = skill;
-          return;
-        }
-        addLine(`cat: ${filename}: No such file`, 'error');
-      },
+      items.filter((item) => item.point.depth < 0).forEach(drawWord);
 
-      cd: (args) => {
-        const filename = args[0];
-        if (!filename) {
-          addLine('cd: missing operand', 'error');
-          return;
-        }
-        if (filename === '..' || filename === '/') {
-          addLine('Already at root', 'result');
-          return;
-        }
-        if (filename === 'skills') {
-          commands.skills();
-          return;
-        }
-        // Check posts first
-        const post = posts.find(p =>
-          p.file.toLowerCase() === filename.toLowerCase() ||
-          p.file.toLowerCase().startsWith(filename.toLowerCase())
-        );
-        if (post) {
-          addLine(`Opening ${post.file}...`, 'result');
-          setTimeout(() => window.location.href = post.url, 500);
-          return;
-        }
-        // Check skills
-        const skill = skills.find(s =>
-          s.file.toLowerCase() === filename.toLowerCase() ||
-          s.file.toLowerCase().startsWith(filename.toLowerCase())
-        );
-        if (skill) {
-          addLine(`Opening ${skill.file}...`, 'result');
-          setTimeout(() => window.location.href = skill.url, 500);
-          return;
-        }
-        addLine(`cd: ${filename}: No such file or directory`, 'error');
-      },
+      const pulse = reducedMotion ? 0 : Math.sin(time * 0.0011) * 0.5 + 0.5;
+      const coreRadius = 10 + pulse * 2.2;
+      let glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, 110 + pulse * 14);
+      glow.addColorStop(0, "rgba(67, 214, 95, 0.50)");
+      glow.addColorStop(0.25, "rgba(67, 214, 95, 0.16)");
+      glow.addColorStop(1, "rgba(67, 214, 95, 0)");
+      context.fillStyle = glow;
+      context.beginPath();
+      context.arc(centerX, centerY, 110 + pulse * 14, 0, Math.PI * 2);
+      context.fill();
 
-      clear: () => {
-        output.innerHTML = '';
-        window.currentPost = null;
-      },
+      glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, coreRadius * 2.4);
+      glow.addColorStop(0, "rgba(240, 255, 243, 0.98)");
+      glow.addColorStop(0.45, "rgba(120, 235, 145, 0.85)");
+      glow.addColorStop(1, "rgba(67, 214, 95, 0)");
+      context.fillStyle = glow;
+      context.beginPath();
+      context.arc(centerX, centerY, coreRadius * 2.4, 0, Math.PI * 2);
+      context.fill();
 
-      whoami: () => {
-        addLine('JM', 'result');
-        addLine('', 'result');
-        addLine('CTO & Co-founder @ <span class="clickable" onclick="window.open(\'https://x.com/genlayer\')">GenLayer</span>', 'result');
-        addLine('Mathematician by training. Builder by obsession.', 'result');
-        addLine('', 'result');
-        addLine('Location: My house in the forest, Portugal', 'result');
-        addLine('Interests: Consensus mechanisms, AI, philosophy, autonomy, martial arts', 'result');
-        addLine('', 'result');
-        addLine('<span class="clickable" onclick="window.open(\'https://github.com/jmlago\')">GitHub: jmlago</span>', 'result');
-        addLine('<span class="clickable" onclick="window.open(\'https://x.com/josemlago\')">X: @josemlago</span>', 'result');
-      },
-
-      neofetch: () => {
-        const logo = `
-   ██████╗ ███████╗███╗   ██╗
-  ██╔════╝ ██╔════╝████╗  ██║
-  ██║  ███╗█████╗  ██╔██╗ ██║
-  ██║   ██║██╔══╝  ██║╚██╗██║
-  ╚██████╔╝███████╗██║ ╚████║
-   ╚═════╝ ╚══════╝╚═╝  ╚═══╝`;
-
-        const info = `
-<span class="label">jm@forest</span>
----------------------
-<span class="label">OS:</span> GenLayer OS v0.4-asimov
-<span class="label">Host:</span> Off-grid Node
-<span class="label">Kernel:</span> Optimistic Democracy
-<span class="label">Uptime:</span> Since Feb 2023
-<span class="label">Resolution:</span> 1920x1080 @ CRT phosphor
-<span class="label">Terminal:</span> JM Blog v2025
-<span class="label">CPU / Disk:</span> ∞ ideas / limited time`;
-
-        const container = document.createElement('div');
-        container.className = 'neofetch';
-        container.innerHTML = `
-          <pre class="neofetch-logo">${logo}</pre>
-          <pre class="neofetch-info">${info}</pre>
-        `;
-        output.appendChild(container);
-      },
-
-      history: () => {
-        if (commandHistory.length === 0) {
-          addLine('No commands in history', 'result');
-        } else {
-          commandHistory.forEach((cmd, i) => {
-            addLine(`  ${i + 1}  ${cmd}`, 'result');
-          });
-        }
-      },
-
-      download: async () => {
-        addLine('Fetching all posts...', 'result');
-        try {
-          let content = '='.repeat(60) + '\n';
-          content += 'JM BLOG - All Posts\n';
-          content += 'Downloaded: ' + new Date().toISOString().split('T')[0] + '\n';
-          content += 'Source: https://jmlago.github.io\n';
-          content += '='.repeat(60) + '\n\n';
-
-          for (const post of posts) {
-            addLine(`  Fetching ${post.file}...`, 'result');
-            const response = await fetch(post.url);
-            const html = await response.text();
-
-            // Extract text content from article
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const article = doc.querySelector('article');
-
-            content += '-'.repeat(60) + '\n';
-            content += `FILE: ${post.file}\n`;
-            content += `TITLE: ${post.title}\n`;
-            content += `DATE: ${post.date}\n`;
-            content += '-'.repeat(60) + '\n\n';
-            content += article ? article.innerText.trim() : 'Could not extract content';
-            content += '\n\n';
-          }
-
-          // Create and download file
-          const blob = new Blob([content], { type: 'text/plain' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'jm-blog-all-posts.txt';
-          a.click();
-          URL.revokeObjectURL(url);
-
-          addLine('Download complete: jm-blog-all-posts.txt', 'result');
-        } catch (err) {
-          addLine('Error downloading posts: ' + err.message, 'error');
-        }
-      },
-
-      skills: () => {
-        addLine('Claude Code Skills', 'result');
-        addLine('Downloadable .md files for Claude Code', 'result');
-        addLine('', 'result');
-        addLine('total ' + skills.length, 'result');
-        skills.forEach(addClickableSkill);
-      }
-    };
-
-    // Process command
-    function processCommand(cmd) {
-      const trimmed = cmd.trim();
-      if (!trimmed) return;
-
-      // Add to history
-      commandHistory.push(trimmed);
-      historyIndex = commandHistory.length;
-
-      // Show command
-      addLine(trimmed, 'cmd');
-
-      // Parse command
-      const parts = trimmed.split(/\s+/);
-      const command = parts[0].toLowerCase();
-      const args = parts.slice(1);
-
-      // Execute
-      if (commands[command]) {
-        commands[command](args);
-      } else {
-        addLine(`${command}: command not found. Type 'help' for available commands.`, 'error');
-      }
+      items.filter((item) => item.point.depth >= 0).forEach(drawWord);
     }
 
-    // Input handler
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        if (window.currentPost && input.value.trim() === '') {
-          // If we just showed a post preview and user hits enter, go to it
-          window.location.href = window.currentPost.url;
-        } else {
-          processCommand(input.value);
-          input.value = '';
-        }
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (historyIndex > 0) {
-          historyIndex--;
-          input.value = commandHistory[historyIndex];
-        }
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (historyIndex < commandHistory.length - 1) {
-          historyIndex++;
-          input.value = commandHistory[historyIndex];
-        } else {
-          historyIndex = commandHistory.length;
-          input.value = '';
-        }
-      } else if (e.key === 'Tab') {
-        e.preventDefault();
-        // Simple tab completion for filenames
-        const parts = input.value.trimEnd().split(/\s+/);
-        if (parts.length >= 2) {
-          const partial = parts[parts.length - 1].toLowerCase();
-          if (partial) {
-            const match = posts.find(p => p.file.toLowerCase().startsWith(partial));
-            if (match) {
-              parts[parts.length - 1] = match.file;
-              input.value = parts.join(' ');
-              resizeInput();
-            }
-          }
-        }
-      } else if (e.ctrlKey && e.key === 'l') {
-        e.preventDefault();
-        commands.clear();
+    function loop(time) {
+      draw(time);
+      animationFrame = window.requestAnimationFrame(loop);
+    }
+
+    function renderStill() {
+      draw(9000);
+    }
+
+    window.addEventListener("resize", () => {
+      window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(() => {
+        resize();
+        if (reducedMotion) renderStill();
+      });
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (reducedMotion) return;
+      if (document.hidden) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+      } else if (!animationFrame) {
+        animationFrame = window.requestAnimationFrame(loop);
       }
     });
 
-    // Focus input on click anywhere
-    document.addEventListener('click', () => input.focus());
-
-    // Resize input to fit content
-    function resizeInput() {
-      input.style.width = ((input.value.length + 1) * 0.6) + 'em';
+    resize();
+    if (reducedMotion) {
+      renderStill();
+      if (document.fonts) document.fonts.ready.then(renderStill);
+    } else {
+      animationFrame = window.requestAnimationFrame(loop);
     }
-    input.addEventListener('input', resizeInput);
-    resizeInput();
-
-    // Initial message
-    addLine('JM Blog Terminal v1.0 // Type "help" for commands.', 'result');
-    addLine('', 'result');
-
-    // Glitch bars
-    function createGlitchBar() {
-      if (Math.random() > 0.7) {
-        const bar = document.createElement('div');
-        bar.className = 'glitch-bar';
-        bar.style.top = Math.random() * 100 + '%';
-        bar.style.transform = `translateX(${(Math.random() - 0.5) * 30}px) skewX(-2deg)`;
-        bar.style.height = (1 + Math.random() * 5) + 'px';
-        document.body.appendChild(bar);
-        setTimeout(() => bar.remove(), 50 + Math.random() * 100);
-      }
-    }
-    setInterval(createGlitchBar, 400);
-
-    // Run ls -la on load
-    setTimeout(() => {
-      processCommand('ls -la');
-    }, 300);
+  })();
   </script>
 </body>
 </html>

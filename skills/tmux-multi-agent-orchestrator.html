@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="One Codex supervising Codex and Claude Code workers through a tiny tmux control plane.">
+  <meta name="theme-color" content="#ffffff">
+  <title>A Stupidly Simple Multi-Agent Orchestrator with tmux · JM Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/essay.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❧</text></svg>">
+</head>
+<body>
+  <nav aria-label="Note navigation">
+    <div class="wrap">
+      <a href="../index.html">&larr; JM Blog</a>
+      <a href="https://github.com/jmlago" rel="me">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="head">
+    <div class="wrap">
+      <span class="skill-badge">Field note</span>
+      <p class="qnum">Note 01 · tmux, Codex, Claude Code, orchestration</p>
+      <h1>A Stupidly Simple Multi-Agent Orchestrator with tmux</h1>
+      <p class="epigraph">One Codex supervising other Codex and Claude Code processes, with no framework in between.</p>
+      <div class="orn" aria-hidden="true">❧</div>
+    </div>
+  </header>
+
+  <article>
+    <div class="wrap">
+      <div class="download-wrap">
+        <a href="tmux-multi-agent-orchestrator.md" download class="download-btn">Download note.md</a>
+      </div>
+
+      <h2>The premise</h2>
+
+      <p class="dropcap">Coding agents are already processes. They read input, do work, print output, occasionally get stuck, and eventually exit. So before reaching for an orchestration framework, it is worth asking a rude question:</p>
+
+      <blockquote>
+        What if the multi-agent control plane is just tmux?
+      </blockquote>
+
+      <p>tmux gives us persistent processes, stable pane identifiers, a way to send input, a way to capture output, and a screen a human can attach to at any moment. It does not care whether a pane contains Codex, Claude Code, a debugger, or a shell script.</p>
+
+      <p>That is enough to build a surprisingly useful local orchestrator.</p>
+
+      <h2>The experiment</h2>
+
+      <p>I tested this with tmux 3.6a, Codex CLI 0.146.0, and Claude Code 2.1.220. The supervisor created one session with two panes, launched one Codex worker and one Claude worker in parallel, collected both results, and handed them to another Codex for synthesis.</p>
+
+      <p>No MCP server. No message broker. No agent framework.</p>
+
+      <h2>Build the control plane</h2>
+
+      <p>Create an isolated scratch directory and two worker panes:</p>
+
+      <pre><code class="language-bash">lab_root=$(mktemp -d -t agent-lab.XXXXXX)
+
+tmux new-session -d -s agent-lab -n workers -c "$lab_root"
+tmux split-window -h -t agent-lab:0 -c "$lab_root"
+tmux select-layout -t agent-lab:0 even-horizontal
+
+codex_pane=$(tmux display-message -p -t agent-lab:0.0 '#{pane_id}')
+claude_pane=$(tmux display-message -p -t agent-lab:0.1 '#{pane_id}')</code></pre>
+
+      <p>The pane IDs matter. Window positions such as <code>agent-lab:0.0</code> can drift after a pane crashes or a human rearranges the session. IDs such as <code>%1</code> remain attached to the actual pane.</p>
+
+      <p>You can watch the whole system with:</p>
+
+      <pre><code class="language-bash">tmux attach -t agent-lab</code></pre>
+
+      <p>Detach with <code>Ctrl-b d</code>. The workers keep running.</p>
+
+      <h2>Launch heterogeneous workers</h2>
+
+      <p>For orchestration, non-interactive invocations are easier to reason about than scraping full-screen TUIs. tmux still gives us persistence and observability, while result and status files give us an unambiguous completion protocol.</p>
+
+      <pre><code class="language-bash">codex_command="codex exec --ephemeral --sandbox read-only \
+  --skip-git-repo-check -C '$lab_root' \
+  -o '$lab_root/codex.out' \
+  'Design a four-state protocol for a tmux agent worker. Do not use tools.'; \
+  printf '%s\n' \$? &gt; '$lab_root/codex.status'"
+
+claude_command="claude -p --effort low --tools '' \
+  --permission-mode plan --no-session-persistence \
+  --max-budget-usd 0.25 \
+  'List four failure modes of a tmux agent orchestrator. Do not use tools.' \
+  &gt; '$lab_root/claude.out' 2&gt;&amp;1; \
+  printf '%s\n' \$? &gt; '$lab_root/claude.status'"
+
+tmux send-keys -l -t "$codex_pane" "$codex_command"
+tmux send-keys -t "$codex_pane" Enter
+
+tmux send-keys -l -t "$claude_pane" "$claude_command"
+tmux send-keys -t "$claude_pane" Enter</code></pre>
+
+      <p>The supervisor is not pretending both agents expose the same API. It only requires the same tiny contract:</p>
+
+      <ul>
+        <li>a stable pane;</li>
+        <li>one scoped input;</li>
+        <li>a result file;</li>
+        <li>a status file.</li>
+      </ul>
+
+      <h2>Observe without guessing</h2>
+
+      <p>The screen remains useful for live inspection:</p>
+
+      <pre><code class="language-bash">tmux list-panes -t agent-lab:0 \
+  -F '#{pane_id} #{pane_current_command} #{pane_dead}'
+
+tmux capture-pane -p -J -S -80 -t "$codex_pane"
+tmux capture-pane -p -J -S -80 -t "$claude_pane"</code></pre>
+
+      <p>But completion should come from the status files, not from trying to recognize a prompt visually:</p>
+
+      <pre><code class="language-bash">test -f "$lab_root/codex.status" &amp;&amp; cat "$lab_root/codex.status"
+test -f "$lab_root/claude.status" &amp;&amp; cat "$lab_root/claude.status"</code></pre>
+
+      <p>In the test, Claude exceeded an initial budget of 0.05 USD. The supervisor observed the non-zero result, raised the ceiling to 0.25 USD, and retried only that worker. A failed worker did not take the rest of the system down.</p>
+
+      <p>That failure was more informative than a clean demo. A useful orchestrator needs <code>FAILED</code>, <code>BLOCKED</code>, and <code>TIMEOUT</code>, not just a cheerful success path.</p>
+
+      <h2>Hand work from one agent to another</h2>
+
+      <p>Once both workers finish, the supervisor can build a new prompt from their artifacts:</p>
+
+      <pre><code class="language-bash">{
+  echo "Synthesize these two worker reports into a minimal state machine."
+  echo
+  echo "CODEX WORKER:"
+  cat "$lab_root/codex.out"
+  echo
+  echo "CLAUDE WORKER:"
+  cat "$lab_root/claude.out"
+} &gt; "$lab_root/handoff.txt"
+
+tmux send-keys -l -t "$codex_pane" \
+  "codex exec --ephemeral --sandbox read-only \
+  --skip-git-repo-check -C '$lab_root' \
+  - &lt; '$lab_root/handoff.txt'"
+tmux send-keys -t "$codex_pane" Enter</code></pre>
+
+      <p>The resulting protocol was:</p>
+
+      <blockquote>
+        READY → INPUT → RUNNING → OUTPUT → DONE → READY<br>
+        RUNNING → BLOCKED | TIMEOUT → DONE
+      </blockquote>
+
+      <p>That is the moment this becomes orchestration rather than two terminals running at once: the supervisor observes results, makes a routing decision, and creates the next task.</p>
+
+      <h2>Four rules that keep it sane</h2>
+
+      <p><strong>Use stable pane IDs.</strong> Capture <code>#{pane_id}</code> when spawning a worker and verify it before every send.</p>
+
+      <p><strong>Do not parse the screen as an API.</strong> Capture-pane is excellent for humans and diagnostics. Machine state belongs in explicit result, status, and sentinel files.</p>
+
+      <p><strong>Isolate writers.</strong> Read-only research workers can share a directory. Agents editing code should receive separate git worktrees and be integrated deliberately.</p>
+
+      <p><strong>Bound everything.</strong> Give each task a wall-clock deadline, an inactivity timeout, a permission policy, and — where supported — a cost ceiling.</p>
+
+      <p>Also remember that captured panes may contain source code, credentials, or command history. The supervisor is part of the security boundary.</p>
+
+      <h2>Where this stops being enough</h2>
+
+      <p>tmux is a good orchestrator for one machine, a handful of workers, and a human who wants to see what is happening. It is not a distributed queue, a durable database, or a cluster scheduler.</p>
+
+      <p>That is a feature. Start with the thing you can understand. Add infrastructure only when a real failure demands it.</p>
+
+      <blockquote>
+        tmux is not the intelligence of the system. It is simply the table where the intelligences sit.
+      </blockquote>
+
+      <div class="signature">JM</div>
+    </div>
+  </article>
+
+  <footer class="colophon">
+    <div class="wrap">
+      <span class="orn" aria-hidden="true">❧</span>
+      Field note · <a href="../index.html">JM Blog</a> · <a href="tmux-multi-agent-orchestrator.md" download>download source</a>
+    </div>
+  </footer>
+</body>
+</html>
