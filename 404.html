@@ -1,89 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 // JM BLOG</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The requested page could not be found.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Page not found · JM Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬤</text></svg>">
-  <style>
-    .error-container {
-      text-align: center;
-      margin-top: 15vh;
-    }
-    .error-code {
-      font-size: 8rem;
-      color: var(--green);
-      text-shadow: 0 0 20px var(--green), 0 0 40px rgba(0, 255, 65, 0.5);
-      margin: 0;
-      line-height: 1;
-    }
-    .error-message {
-      color: var(--green-dim);
-      font-size: 1.2rem;
-      margin: 20px 0;
-    }
-    .error-details {
-      color: #ff4040;
-      margin: 30px 0;
-    }
-    .home-link {
-      color: var(--green);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      cursor: pointer;
-    }
-    .home-link:hover {
-      text-shadow: 0 0 10px var(--green);
-    }
-  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❧</text></svg>">
 </head>
 <body>
-  <div class="right-glow"></div>
-
-  <div class="container">
-    <div class="error-container">
-      <pre class="error-code">404</pre>
-      <p class="error-message">FILE NOT FOUND</p>
-      <div class="error-details">
-        <p>> ERROR: The requested resource does not exist on this server.</p>
-        <p>> SEGFAULT at 0x00000000</p>
-      </div>
-      <p>
-        <a href="/" class="home-link">cd /home</a>
-      </p>
-    </div>
-  </div>
-
-  <div class="status-bar">
-    <span>SYSTEM STATUS: ERROR // RESOURCE NOT FOUND</span>
+  <main class="error-page">
     <div>
-      <a href="https://github.com/jmlago">GitHub</a>
-      <a href="https://x.com/josemlago">X</a>
+      <div class="error-mark" aria-hidden="true">404</div>
+      <h1>This page has left its orbit.</h1>
+      <p>The requested stone is not in the present arrangement. It may have moved, or it may not have been written yet.</p>
+      <a class="home-link" href="/">&larr; Return to JM Blog</a>
     </div>
-  </div>
-
-  <script>
-    // Keyboard navigation: Backspace or Escape to go home
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Backspace' || e.key === 'Escape') {
-        e.preventDefault();
-        window.location.href = '/';
-      }
-    });
-
-    function createGlitchBar() {
-      if (Math.random() > 0.5) {
-        const bar = document.createElement('div');
-        bar.className = 'glitch-bar';
-        bar.style.top = Math.random() * 100 + '%';
-        bar.style.transform = `translateX(${(Math.random() - 0.5) * 30}px) skewX(-2deg)`;
-        bar.style.height = (1 + Math.random() * 5) + 'px';
-        document.body.appendChild(bar);
-        setTimeout(() => bar.remove(), 50 + Math.random() * 100);
-      }
-    }
-    setInterval(createGlitchBar, 300);
-  </script>
+  </main>
 </body>
 </html>

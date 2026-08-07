@@ -1,114 +1,59 @@
-# JM Blog - CRT Terminal Theme
+# JM Blog
 
-A blog with retro CRT terminal aesthetics and glitch effects.
+A small static site for essays and field notes. The visual system is editorial: warm black type on white paper, green ornament, generous reading measure, and an animated conceptual orbit on the landing page.
+
+There is no build step or framework. The site is plain HTML, CSS, and a little JavaScript, and is deployed with GitHub Pages.
+
+## Local preview
+
+From the repository root:
+
+```bash
+npx --yes http-server . -p 8000 -c-1
+```
+
+Then open <http://localhost:8000/>. Stop the server with `Ctrl+C`. The first run may download the small `http-server` package into the npm cache; it does not modify the repository.
 
 ## Structure
 
-```
-blog/
-├── index.html          # Main page with interactive terminal
-├── 404.html            # Custom error page
-├── robots.txt          # Search engine directives
-├── sitemap.xml         # SEO sitemap
+```text
+.
+├── index.html             # Landing page and animated orbit
+├── 404.html               # Custom not-found page
 ├── css/
-│   └── style.css       # CRT/glitch styles
+│   ├── style.css          # Landing and 404 styles
+│   └── essay.css          # Essays and field-note styles
 ├── posts/
-│   ├── _TEMPLATE.html  # Template for new posts
-│   └── *.html          # Individual posts
-├── images/             # Images for posts
-└── .nojekyll           # For GitHub Pages
+│   ├── _TEMPLATE.html     # Starting point for a new essay
+│   └── *.html             # Published essays
+├── skills/
+│   ├── *.html             # Readable field notes
+│   └── *.md               # Downloadable source files
+├── sitemap.xml
+└── .nojekyll
 ```
 
-## How to add a new post
+## Add an essay
 
-### 1. Create the HTML file in `/posts/`
+1. Copy `posts/_TEMPLATE.html` to a kebab-case filename in `posts/`.
+2. Fill in the title, description, essay number, date, tags, epigraph, and article body.
+3. Add an `.essay-entry` to the Essays section in `index.html`.
+4. Add the public URL to `sitemap.xml`.
 
-Copy `_TEMPLATE.html` and modify the content.
+The article theme supports normal prose, headings, lists, blockquotes, tables, code blocks, footnotes, and optional quaestio-style callouts. KaTeX renders `$inline$` and `$$display$$` mathematics.
 
-### 2. Add it to index.html
+## Add a field note
 
-In the `posts` array in the JavaScript:
+Create matching `.html` and `.md` files under `skills/`, use `skills/tmux-multi-agent-orchestrator.html` as the HTML reference, add the note to `index.html`, and register its URL in `sitemap.xml`.
 
-```javascript
-const posts = [
-  { file: 'MY_NEW_POST.log', url: 'posts/my-new-post.html', date: '2025-12-07', size: '3.2K', title: 'My New Post', excerpt: 'Short description...' },
-  // ... other posts
-];
-```
+## External dependencies
 
-## Content formatting
+- Google Fonts: EB Garamond and UnifrakturMaguntia
+- KaTeX 0.16.9 for essay mathematics
+- js-sha3 0.9.3 for the short content hash in essay colophons
 
-### LaTeX
+The site remains readable if these scripts fail; the web fonts fall back to Georgia and formulas remain as source text.
 
-Inline: `$E = mc^2$` → $E = mc^2$
+## Deploy
 
-Display (block):
-```
-$$
-P_n = \sum_{k=m}^{n} \binom{n}{k} p^k (1-p)^{n-k}
-$$
-```
-
-### Code with syntax highlighting
-
-```html
-<pre><code class="language-python">
-def hello():
-    # This is a comment
-    print("Hello, world!")
-</code></pre>
-```
-
-Supported languages: `python`, `javascript`, `solidity`, `bash`, `rust`
-
-### Images
-
-```html
-<figure>
-  <img src="../images/my-image.png" alt="Description">
-  <figcaption>Optional caption</figcaption>
-</figure>
-```
-
-### Blockquotes
-
-```html
-<blockquote>
-  This is a quote.
-</blockquote>
-```
-
-## Deploy on GitHub Pages
-
-1. Push all files to your repo
-2. Go to Settings → Pages
-3. Source: `main` branch, `/ (root)`
-4. The `.nojekyll` file is included to prevent Jekyll processing
-
-## CRT Effects
-
-- **Scanlines**: subtle horizontal lines
-- **Flicker**: very subtle flicker (0.5%)
-- **Glitch bars**: random green bars
-- **Vignette**: darkening at edges
-- **Right glow**: glow on the right side
-- **Block cursor**: blinking rectangular cursor
-
-## Terminal commands (index.html)
-
-- `ls` / `ls -la` - List posts
-- `cat <file>` - Preview a post
-- `cd <file>` - Open a post
-- `clear` - Clear screen
-- `whoami` - Author info
-- `neofetch` - System info
-- `history` - Command history
-- `download` - Download all posts as .txt (for AI/LLM consumption)
-- `help` - Show help
-
-## Keyboard shortcuts
-
-- `Tab` - Autocomplete filenames
-- `↑` `↓` - Navigate command history
-- `Ctrl+L` - Clear screen
-- `Backspace` / `Escape` - Go back to index (from a post)
+Push the desired branch to the GitHub Pages source branch. The included `.nojekyll` file keeps Pages from processing the static files with Jekyll.

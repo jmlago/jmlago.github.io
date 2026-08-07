@@ -1,74 +1,69 @@
-# CLAUDE.md - JM Blog Codebase Guide
+# CLAUDE.md — JM Blog codebase guide
 
 ## Overview
 
-Static personal blog with retro CRT terminal aesthetic. Hosted on GitHub Pages at `jmlago.github.io`. No build tools or framework - pure HTML/CSS/JS.
+Static personal blog hosted at `jmlago.github.io`. It uses an editorial white-paper aesthetic with EB Garamond typography, green ornamental accents, and a canvas orbit on the landing page. There is no framework or build tool.
 
-## Directory Structure
+## Directory structure
 
-```
+```text
 /
-├── index.html           # Main terminal interface (interactive shell)
-├── css/style.css        # All styling (CRT effects, typography)
+├── index.html             # Landing page, catalog, and orbit animation
+├── css/style.css          # Landing page and 404 theme
+├── css/essay.css          # Shared essay and field-note theme
 ├── posts/
-│   ├── _TEMPLATE.html   # Copy this for new posts
-│   └── *.html           # Individual blog posts
+│   ├── _TEMPLATE.html     # Copy for new essays
+│   └── *.html             # Published essays
 ├── skills/
-│   └── *.html + *.md    # Claude Code skills (downloadable)
-├── images/              # Post images
-├── sitemap.xml          # SEO sitemap (UPDATE when adding content)
-├── 404.html             # Custom error page
-└── .claude/skills/      # Claude Code skills for this repo
+│   └── *.html + *.md      # Readable and downloadable field notes
+├── sitemap.xml
+├── 404.html
+└── .nojekyll
 ```
 
-## Skills
+## Repository guides
 
-For detailed step-by-step instructions, use these skills:
+- Create a blog post: `.claude/skills/create-blog-post.md`
+- Create a downloadable field note: `.claude/skills/create-skill.md`
 
-- **Create a new blog post**: `.claude/skills/create-blog-post.md`
-- **Create a new skill**: `.claude/skills/create-skill.md`
+## Content conventions
 
-## Quick Reference
+- Dates: `YYYY-MM-DD`, represented with `<time datetime="YYYY-MM-DD">`.
+- URLs: kebab-case HTML filenames.
+- Landing items: semantic `.essay-entry` markup inside Essays or Notes; there is no JavaScript content registry.
+- First article paragraph: add `class="dropcap"`.
+- Article metadata: `.qnum`; synopsis or quotation: `.epigraph`.
+- Keep article text inside `<article><div class="wrap">…</div></article>`.
 
-### Terminal Commands (index.html)
+### Mathematics
 
-- `ls [-la]`: List posts
-- `ls skills` or `skills`: List Claude Code skills
-- `cat <file>`: Preview post or skill
-- `cd <file>`: Open post or skill
-- `clear`, `whoami`, `neofetch`, `history`, `download`
-
-### Content Formatting
-
-**Math (KaTeX)**:
 - Inline: `$E = mc^2$`
-- Block: `$$\frac{a}{b}$$`
+- Display: `$$\frac{a}{b}$$`
 
-**Code (Prism)**: `<pre><code class="language-python">...</code></pre>`
-Supported: `python`, `javascript`, `solidity`, `bash`, `rust`
+KaTeX 0.16.9 is loaded only on pages that contain mathematics.
 
-**HTML elements**: `<strong>`, `<em>`, `<a>`, `<blockquote>`, `<ul>/<ol>`
+### Code and prose
 
-### Naming Conventions
+Use `<pre><code class="language-python">…</code></pre>` for code. The language class documents the format; the light theme intentionally does not require a syntax highlighter.
 
-- Date format: `YYYY-MM-DD`
-- Post URLs: `kebab-case.html`
-- Terminal posts: `NNN_SCREAMING_SNAKE.log`
-- Terminal skills: `SCREAMING_SNAKE.skill`
+Available article elements include `<strong>`, `<em>`, `<a>`, `<blockquote>`, `<ul>`, `<ol>`, tables, `.disputa`, and `.notes`.
 
-### CSS Variables
+## Design tokens
 
-- `--green`: #00ff41 (primary)
-- `--green-bright`: #00ff7f (bold, links)
-- `--green-dim`: #00aa2a (meta)
-- `--black`: #000000 (background)
+- `--paper`: `#fff`
+- `--ink`: `#191817`
+- `--muted`: `#6f6d68`
+- `--hair`: `#e7e5df`
+- `--green`: `#1e8a3c`
 
-## External Dependencies (CDN)
+Keep new public pages within this palette and reuse one of the two shared stylesheets.
 
-- **KaTeX** 0.16.9: LaTeX rendering
-- **Prism** 1.29.0: Code syntax highlighting
-- **Fira Code**: Monospace font
+## Local validation
 
-## Git Workflow
+Run `npx --yes http-server . -p 8000 -c-1` from the repository root and open `http://localhost:8000/`. Check the landing page and changed content at both desktop and mobile widths. Update `sitemap.xml` whenever a public URL is added or materially changed.
 
-Single `main` branch. Push directly to deploy via GitHub Pages.
+## External dependencies
+
+- Google Fonts: EB Garamond and UnifrakturMaguntia
+- KaTeX 0.16.9 for mathematics
+- js-sha3 0.9.3 for essay content hashes

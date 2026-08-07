@@ -1,136 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TITULO DEL POST // JM BLOG</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SHORT POST DESCRIPTION">
+  <meta name="theme-color" content="#ffffff">
+  <title>POST TITLE · JM Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/essay.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
-  <style>
-    /* Override Prism theme for terminal look */
-    pre[class*="language-"], code[class*="language-"] {
-      background: rgba(0, 20, 0, 0.8) !important;
-      color: #00ff41 !important;
-      text-shadow: none !important;
-    }
-    .token.comment { color: #006600 !important; }
-    .token.keyword { color: #00ff7f !important; }
-    .token.string { color: #7fff7f !important; }
-    .token.number { color: #00ffff !important; }
-    .token.function { color: #00ff41 !important; }
-    .token.operator { color: #00aa2a !important; }
-  </style>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬤</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❧</text></svg>">
 </head>
 <body>
-  <div class="right-glow"></div>
+  <nav aria-label="Essay navigation">
+    <div class="wrap">
+      <a href="../index.html">&larr; JM Blog</a>
+      <a href="https://x.com/josemlago" rel="me">@josemlago</a>
+    </div>
+  </nav>
 
-  <div class="container">
-    <a href="../index.html" class="back-link">cd ..</a>
+  <header class="head">
+    <div class="wrap">
+      <p class="qnum">Essay XX · <time datetime="YYYY-MM-DD">YYYY-MM-DD</time> · Tag1, Tag2, Tag3</p>
+      <h1>Post Title</h1>
+      <p class="epigraph">A brief sentence introducing the essay's thesis.</p>
+      <div class="orn" aria-hidden="true">❧</div>
+    </div>
+  </header>
 
-    <article>
-      <div class="post-header">
-        <h1>Título del Post</h1>
-        <p class="meta">2025-12-XX // Tag1, Tag2, Tag3</p>
-      </div>
+  <article>
+    <div class="wrap">
+      <p class="dropcap">Introductory paragraph. The <code>dropcap</code> class turns its first letter into a decorative initial.</p>
 
-      <p>Párrafo introductorio del post.</p>
+      <h2>First section</h2>
 
-      <h2>Primera Sección</h2>
+      <p>Content with <strong>bold</strong> and <em>italic</em> text.</p>
 
-      <p>Contenido con <strong>negrita</strong> y <em>cursiva</em>.</p>
+      <p>Inline formula: $E = mc^2$.</p>
 
-      <p>Fórmula inline: $E = mc^2$</p>
-
-      <p>Fórmula en bloque:</p>
+      <p>Display formula:</p>
 
       $$
       P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
       $$
 
-      <h2>Código</h2>
+      <h2>Code</h2>
 
-      <pre><code class="language-python">
-def consensus_check(validators: list) -> bool:
-    """
-    Verifica si hay consenso entre validadores.
-    Requiere > 2/3 de acuerdo.
-    """
-    votes = [v.vote() for v in validators]
+      <pre><code class="language-python">def consensus_check(validators: list) -&gt; bool:
+    """Return whether the validators have reached consensus."""
+    votes = [validator.vote() for validator in validators]
     threshold = len(validators) * 2 // 3
-    return sum(votes) > threshold
-      </code></pre>
+    return sum(votes) &gt; threshold</code></pre>
 
-      <h2>Cita</h2>
+      <h2>Quotation</h2>
 
       <blockquote>
-        "Una cita relevante que apoya el argumento."
+        A relevant quotation supporting the argument.
       </blockquote>
 
-      <h2>Lista</h2>
+      <h2>List</h2>
 
       <ul>
-        <li>Primer punto</li>
-        <li>Segundo punto</li>
-        <li>Tercer punto</li>
+        <li>First point</li>
+        <li>Second point</li>
+        <li>Third point</li>
       </ul>
 
       <div class="signature">JM</div>
-    </article>
-  </div>
-
-  <div class="status-bar">
-    <span>SYSTEM STATUS: ONLINE // TYPE 'help' FOR COMMANDS.</span>
-    <div>
-      <a href="https://github.com/jmlago">GitHub</a>
-      <a href="https://x.com/josemlago">X</a>
     </div>
-  </div>
+  </article>
 
-  <script>
-    // Keyboard navigation: Backspace or Escape to go back
-    document.addEventListener('keydown', (e) => {
-      // Only trigger if not typing in an input field
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.key === 'Backspace' || e.key === 'Escape') {
-        e.preventDefault();
-        window.location.href = '../index.html';
-      }
-    });
+  <footer class="colophon">
+    <div class="wrap">
+      <span class="orn" aria-hidden="true">❧</span>
+      Written by JM · <a href="../index.html">JM Blog</a> · keccak <code id="content-hash">0x…</code>
+    </div>
+  </footer>
 
-    function createGlitchBar() {
-      if (Math.random() > 0.7) {
-        const bar = document.createElement('div');
-        bar.className = 'glitch-bar';
-        bar.style.top = Math.random() * 100 + '%';
-        bar.style.transform = `translateX(${(Math.random() - 0.5) * 30}px) skewX(-2deg)`;
-        bar.style.height = (1 + Math.random() * 5) + 'px';
-        document.body.appendChild(bar);
-        setTimeout(() => bar.remove(), 50 + Math.random() * 100);
-      }
-    }
-    setInterval(createGlitchBar, 400);
-  </script>
-  <!-- KaTeX for LaTeX rendering -->
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof renderMathInElement !== "function") return;
       renderMathInElement(document.body, {
         delimiters: [
-          {left: '$$', right: '$$', display: true},
-          {left: '$', right: '$', display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
         ]
       });
     });
   </script>
-  <!-- Prism for code highlighting -->
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-solidity.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-rust.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.3/src/sha3.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof keccak256 !== "function") return;
+      const fullHash = keccak256(document.querySelector("article").innerText);
+      document.getElementById("content-hash").textContent =
+        `0x${fullHash.substring(0, 8)}…${fullHash.substring(56)}`;
+    });
+  </script>
 </body>
 </html>

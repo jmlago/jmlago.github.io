@@ -1,0 +1,420 @@
+/* Editorial reading theme — JM Blog */
+:root {
+  color-scheme: light;
+  --paper: #fff;
+  --ink: #191817;
+  --muted: #6f6d68;
+  --hair: #e7e5df;
+  --green: #1e8a3c;
+  --code-paper: #f7f6f2;
+  --selection: #dff5e4;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 280px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: 20px;
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+}
+
+.wrap {
+  width: min(100%, 660px);
+  margin: 0 auto;
+  padding-inline: 24px;
+}
+
+a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hair);
+  overflow-wrap: anywhere;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+a:hover {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+nav {
+  padding: 26px 0;
+}
+
+nav .wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+nav a {
+  color: var(--muted);
+  border-bottom: 0;
+  font-size: 14px;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+}
+
+nav a:hover {
+  color: var(--green);
+}
+
+.head {
+  padding: 36px 0 10px;
+  text-align: center;
+}
+
+.qnum {
+  color: var(--muted);
+  font-size: 14px;
+  font-variant: small-caps;
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 12px 0 14px;
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.epigraph {
+  max-width: 480px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 17.5px;
+  font-style: italic;
+}
+
+.epigraph .who {
+  display: block;
+  margin-top: 4px;
+  font-size: 13.5px;
+  font-style: normal;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+
+.head .orn {
+  margin: 22px 0 6px;
+  color: var(--green);
+  font-size: 15px;
+}
+
+article {
+  padding: 22px 0 30px;
+}
+
+article p {
+  margin-bottom: 0;
+  text-indent: 1.6em;
+}
+
+article p.dropcap,
+article h2 + p,
+article h3 + p,
+article blockquote + p,
+article pre + p,
+article ul + p,
+article ol + p,
+article table + p,
+article .disputa + p,
+article .download-wrap + p {
+  text-indent: 0;
+}
+
+article strong {
+  font-weight: 500;
+}
+
+article ul,
+article ol {
+  margin: 14px 0 14px 34px;
+}
+
+article li {
+  margin-bottom: 6px;
+}
+
+h2 {
+  margin: 44px 0 18px;
+  color: var(--ink);
+  font-size: 16px;
+  font-variant: small-caps;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-align: center;
+}
+
+h2::before,
+h2::after {
+  margin: 0 10px;
+  color: var(--green);
+  content: "·";
+}
+
+h3 {
+  margin: 28px 0 10px;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.dropcap::first-letter {
+  float: left;
+  padding: 6px 12px 0 0;
+  color: var(--green);
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 4.4em;
+  line-height: 0.78;
+}
+
+blockquote {
+  max-width: 520px;
+  margin: 28px auto;
+  font-size: 21px;
+  font-style: italic;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.katex {
+  font-size: 1.02em;
+}
+
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 4px;
+}
+
+table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 22px auto;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 17px;
+}
+
+th,
+td {
+  padding: 8px 14px;
+  border: 1px solid var(--hair);
+  text-align: left;
+}
+
+th {
+  font-variant: small-caps;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+pre {
+  margin: 22px 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  background: var(--code-paper);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+code {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+p code,
+li code {
+  padding: 1px 5px;
+  background: var(--code-paper);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.signature {
+  margin-top: 42px;
+  color: var(--green);
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 30px;
+  text-align: right;
+}
+
+.colophon {
+  margin-top: 14px;
+  padding: 26px 0 70px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+}
+
+.colophon .orn {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--green);
+  font-style: normal;
+}
+
+.colophon code {
+  font-size: 12.5px;
+  font-style: normal;
+}
+
+/* Quaestio structure (optional per essay) */
+.disputa {
+  margin: 26px 0;
+  padding-left: 22px;
+  border-left: 1px solid var(--hair);
+}
+
+.disputa .label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--green);
+  font-size: 14px;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+}
+
+.disputa p {
+  font-size: 18.5px;
+  text-indent: 0;
+}
+
+sup.fn {
+  color: var(--green);
+  font-size: 0.65em;
+}
+
+.notes {
+  margin-top: 46px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+}
+
+.notes h4 {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-variant: small-caps;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.notes ol {
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 15.5px;
+}
+
+.notes li {
+  margin-bottom: 6px;
+}
+
+/* Downloadable notes */
+.skill-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--green);
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+}
+
+.download-wrap {
+  margin: 4px 0 28px;
+  text-align: center;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-size: 14px;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+}
+
+.download-btn:hover {
+  background: var(--selection);
+}
+
+@media (max-width: 560px) {
+  body {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  nav {
+    padding-top: 20px;
+  }
+
+  .head {
+    padding-top: 24px;
+  }
+
+  .qnum {
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+  }
+
+  h2::before,
+  h2::after {
+    margin-inline: 6px;
+  }
+
+  article ul,
+  article ol {
+    margin-left: 24px;
+  }
+
+  pre {
+    margin-inline: -8px;
+    padding: 14px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,43 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Illusion of Determinism // JM BLOG</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Why all blockchain truth is subjective — and why that's okay.">
+  <meta name="theme-color" content="#ffffff">
+  <title>The Illusion of Determinism · JM Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/essay.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
-  <style>
-    /* Override Prism theme for terminal look */
-    pre[class*="language-"], code[class*="language-"] {
-      background: rgba(0, 20, 0, 0.8) !important;
-      color: #00ff41 !important;
-      text-shadow: none !important;
-    }
-    .token.comment { color: #006600 !important; }
-    .token.keyword { color: #00ff7f !important; }
-    .token.string { color: #7fff7f !important; }
-    .token.number { color: #00ffff !important; }
-    .token.function { color: #00ff41 !important; }
-    .token.operator { color: #00aa2a !important; }
-  </style>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬤</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❧</text></svg>">
 </head>
 <body>
-  <div class="right-glow"></div>
+  <nav aria-label="Essay navigation">
+    <div class="wrap">
+      <a href="../index.html">&larr; JM Blog</a>
+      <a href="https://x.com/josemlago" rel="me">@josemlago</a>
+    </div>
+  </nav>
 
-  <div class="container">
-    <a href="../index.html" class="back-link">cd ..</a>
+  <header class="head">
+    <div class="wrap">
+      <p class="qnum">Essay 01 · <time datetime="2025-12-09">2025-12-09</time> · Objectivity, Consensus, GenLayer</p>
+      <h1>The Illusion of Determinism</h1>
+      <p class="epigraph">Why all blockchain truth is subjective — and why that's okay.</p>
+      <div class="orn" aria-hidden="true">❧</div>
+    </div>
+  </header>
 
-    <article>
-      <div class="post-header">
-        <h1>001 The Illusion of Determinism</h1>
-        <p class="meta">2025-12-09 // <span id="content-hash">0x...</span> // Objectivity, Consensus, GenLayer</p>
-      </div>
-
-      <p><em>Why all blockchain truth is subjective — and why that's okay.</em></p>
-
-      <p>There's a dichotomy we take for granted in the blockchain world: deterministic is objective, non-deterministic is subjective. Ethereum is objective because it executes predictable code. Any system that incorporates uncertainty — LLMs, real-world data, interpretation — is subjective and therefore less reliable.</p>
+  <article>
+    <div class="wrap">
+      <p class="dropcap">There's a dichotomy we take for granted in the blockchain world: deterministic is objective, non-deterministic is subjective. Ethereum is objective because it executes predictable code. Any system that incorporates uncertainty — LLMs, real-world data, interpretation — is subjective and therefore less reliable.</p>
 
       <p>This distinction is an illusion.</p>
 
@@ -94,87 +89,36 @@
       </blockquote>
 
       <div class="signature">JM</div>
-    </article>
-  </div>
-
-  <div class="status-bar">
-    <span id="reading-progress">READING: 0% COMPLETE</span>
-    <div>
-      <a href="https://github.com/jmlago">GitHub</a>
-      <a href="https://x.com/josemlago">X</a>
     </div>
-  </div>
+  </article>
 
-  <script>
-    // Reading progress tracker
-    let maxProgress = 0;
-    function updateReadingProgress() {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight - windowHeight;
-      const scrolled = window.scrollY;
-      const currentProgress = documentHeight > 0 ? Math.min(100, Math.round((scrolled / documentHeight) * 100)) : 0;
-      maxProgress = Math.max(maxProgress, currentProgress);
-      const el = document.getElementById('reading-progress');
-      el.textContent = 'READING 001_ILLUSION_DETERMINISM.log // ' + maxProgress + '% COMPLETE';
-      el.style.color = maxProgress >= 100 ? 'var(--green)' : '#ff9500';
-      el.style.textShadow = maxProgress >= 100 ? '0 0 5px var(--green)' : '0 0 5px #ff9500';
-    }
-    window.addEventListener('scroll', updateReadingProgress);
-    window.addEventListener('resize', updateReadingProgress);
-    updateReadingProgress();
+  <footer class="colophon">
+    <div class="wrap">
+      <span class="orn" aria-hidden="true">❧</span>
+      Written by JM · <a href="../index.html">JM Blog</a> · keccak <code id="content-hash">0x…</code>
+    </div>
+  </footer>
 
-    // Keyboard navigation: Backspace or Escape to go back
-    document.addEventListener('keydown', (e) => {
-      // Only trigger if not typing in an input field
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.key === 'Backspace' || e.key === 'Escape') {
-        e.preventDefault();
-        window.location.href = '../index.html';
-      }
-    });
-
-    function createGlitchBar() {
-      if (Math.random() > 0.7) {
-        const bar = document.createElement('div');
-        bar.className = 'glitch-bar';
-        bar.style.top = Math.random() * 100 + '%';
-        bar.style.transform = `translateX(${(Math.random() - 0.5) * 30}px) skewX(-2deg)`;
-        bar.style.height = (1 + Math.random() * 5) + 'px';
-        document.body.appendChild(bar);
-        setTimeout(() => bar.remove(), 50 + Math.random() * 100);
-      }
-    }
-    setInterval(createGlitchBar, 400);
-  </script>
-  <!-- KaTeX for LaTeX rendering -->
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof renderMathInElement !== "function") return;
       renderMathInElement(document.body, {
         delimiters: [
-          {left: '$$', right: '$$', display: true},
-          {left: '$', right: '$', display: false}
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
         ]
       });
     });
   </script>
-  <!-- Prism for code highlighting -->
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-solidity.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-rust.min.js"></script>
-  <!-- Keccak hash -->
   <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.3/src/sha3.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const article = document.querySelector('article');
-      const text = article.innerText;
-      const fullHash = keccak256(text);
-      const hash = '0x' + fullHash.substring(0, 8) + '...' + fullHash.substring(56);
-      document.getElementById('content-hash').textContent = hash;
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof keccak256 !== "function") return;
+      const fullHash = keccak256(document.querySelector("article").innerText);
+      document.getElementById("content-hash").textContent =
+        `0x${fullHash.substring(0, 8)}…${fullHash.substring(56)}`;
     });
   </script>
 </body>
