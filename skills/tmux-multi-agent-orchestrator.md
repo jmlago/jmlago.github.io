@@ -166,14 +166,30 @@ The comparison also found an honest hole in the larger system. GenSwarms persist
 
 So agent count is the wrong decision rule. Two unsupervised agents reading hostile input already justify isolation. Twelve trusted panes doing coarse work may still be perfectly manageable.
 
-Each side found one feature worth stealing. tmuxq should append a non-authoritative JSONL event journal for diagnosis. GenSwarms should make its local backend attachable as a raw terminal. The most interesting system may be the hybrid: an OTP control plane whose local workers can still live in tmux.
+## The missing backend
 
-## The topology is not fixed
+The comparison started as tmuxq versus GenSwarms, but that is the wrong abstraction boundary. GenSwarms owns topology, supervision, queues, isolation, events, and APIs. tmux owns a persistent terminal that both software and humans can enter. The missing piece is a backend that joins them without flattening an interactive agent into a stateless API call.
 
-The debate used two peers and a judge, but the same primitives can express a supervisor with many workers, a research-to-implementation pipeline, an author-reviewer loop, a hierarchy of supervisors, or a pool of temporary specialists.
+~~~text
+GenSwarms control plane
+        ↓
+TmuxBackend
+    ├── CodexAdapter
+    ├── ClaudeAdapter
+    ├── OpenCodeAdapter
+    └── GenericTuiAdapter
+        ↓
+persistent, attachable agent panes
+~~~
 
-tmux does not decide who talks to whom. That topology is just routing policy. The panes are processes, pane IDs are addresses, `send-keys` is transport, files are durable state, and `attach` is the debugger.
+The backend contract is small: start the client, send a task, detect readiness, expose the session ID, interrupt safely, and resume after failure. Each CLI adapter handles its own launch command and session semantics. tmux keeps the PTY and pane alive; GenSwarms keeps the worker identity, task state, restart policy, logs, and routing graph.
 
-For one machine and a handful of coding agents, it is difficult to make a framework smaller without making the failure modes invisible.
+It should expose two outputs instead of pretending a terminal is structured data. The raw terminal stream exists for `attach`, scrollback, and human debugging. Normalized lifecycle events—`started`, `ready`, `running`, `completed`, `crashed`, `restarting`—feed logs, telemetry, and the API. A restart should restore both the process and, where the CLI supports it, the conversation.
 
-> tmux is not the intelligence of the system. It is the room where the intelligences keep talking.
+tmux still provides no isolation. A `TmuxBackend` may itself run inside Docker or Bubblewrap when the trust boundary requires it.
+
+That is the actual result of the experiment. The useful invention is not another multi-agent framework. It is a common backend that turns Codex, Claude Code, OpenCode, or almost any interactive coding TUI into a supervised worker without taking its terminal away.
+
+Once that boundary exists, the topology is only routing policy: supervisor and workers, pipeline, debate and judge, hierarchy, or a temporary specialist pool.
+
+> The runtime should own the swarm. The terminal should remain human.
