@@ -1,148 +1,156 @@
-# A Stupidly Simple Multi-Agent Orchestrator with tmux
+# tmux Is the Smallest Multi-Agent Framework I Could Build
 
-One Codex supervising other Codex and Claude Code processes, with no framework in between.
+A persistent GPT-5.6-Sol debated Fable 5 inside two panes. I routed the messages and judged the result.
 
-## The premise
+## The correction
 
-Coding agents are already processes. They read input, do work, print output, occasionally get stuck, and eventually exit. So before reaching for an orchestration framework, it is worth asking a rude question:
+My first version of this experiment launched `codex exec` and `claude -p`, waited for two files, then exited. It worked, but it missed the interesting part.
 
-> What if the multi-agent control plane is just tmux?
+Coding agents already have interactive sessions. They remember earlier turns, accept follow-ups, expose their work on screen, and can be interrupted by a human. Throwing that away turns them into expensive shell commands.
 
-tmux gives us persistent processes, stable pane identifiers, a way to send input, a way to capture output, and a screen a human can attach to at any moment. It does not care whether a pane contains Codex, Claude Code, a debugger, or a shell script.
+So the better question is:
 
-That is enough to build a surprisingly useful local orchestrator.
+> What if the smallest multi-agent runtime is just persistent TUIs inside tmux?
 
-## The experiment
+The supervisor keeps the pane IDs, sends messages with `tmux send-keys`, reads the visible state with `capture-pane`, and routes one agent's answer to another. A human can attach to the same session at any moment. No agent SDK is required.
 
-I tested this with tmux 3.6a, Codex CLI 0.146.0, and Claude Code 2.1.220. The supervisor created one session with two panes, launched one Codex worker and one Claude worker in parallel, collected both results, and handed them to another Codex for synthesis.
+## Two agents that stay alive
 
-No MCP server. No message broker. No agent framework.
-
-## Build the control plane
-
-Create an isolated scratch directory and two worker panes:
+I created an empty scratch directory and one wide tmux window with two panes:
 
 ~~~bash
 lab_root=$(mktemp -d -t agent-lab.XXXXXX)
+mkdir -p "$lab_root"/{codex,claude}
 
-tmux new-session -d -s agent-lab -n workers -c "$lab_root"
-tmux split-window -h -t agent-lab:0 -c "$lab_root"
-tmux select-layout -t agent-lab:0 even-horizontal
+tmux new-session -d -s agent-lab -n agents -x 220 -y 52 \
+  -c "$lab_root/codex"
+tmux split-window -h -t agent-lab:agents -c "$lab_root/claude"
+tmux select-layout -t agent-lab:agents even-horizontal
 
-codex_pane=$(tmux display-message -p -t agent-lab:0.0 '#{pane_id}')
-claude_pane=$(tmux display-message -p -t agent-lab:0.1 '#{pane_id}')
+codex_pane=$(tmux display-message -p -t agent-lab:agents.0 '#{pane_id}')
+claude_pane=$(tmux display-message -p -t agent-lab:agents.1 '#{pane_id}')
 ~~~
 
-The pane IDs matter. Window positions such as <code>agent-lab:0.0</code> can drift after a pane crashes or a human rearranges the session. IDs such as <code>%1</code> remain attached to the actual pane.
-
-You can watch the whole system with:
+Then I launched the normal interactive clients, not their print modes:
 
 ~~~bash
-tmux attach -t agent-lab
-~~~
-
-Detach with <code>Ctrl-b d</code>. The workers keep running.
-
-## Launch heterogeneous workers
-
-For orchestration, non-interactive invocations are easier to reason about than scraping full-screen TUIs. tmux still gives us persistence and observability, while result and status files give us an unambiguous completion protocol.
-
-~~~bash
-codex_command="codex exec --ephemeral --sandbox read-only \
-  --skip-git-repo-check -C '$lab_root' \
-  -o '$lab_root/codex.out' \
-  'Design a four-state protocol for a tmux agent worker. Do not use tools.'; \
-  printf '%s\n' \$? > '$lab_root/codex.status'"
-
-claude_command="claude -p --effort low --tools '' \
-  --permission-mode plan --no-session-persistence \
-  --max-budget-usd 0.25 \
-  'List four failure modes of a tmux agent orchestrator. Do not use tools.' \
-  > '$lab_root/claude.out' 2>&1; \
-  printf '%s\n' \$? > '$lab_root/claude.status'"
-
-tmux send-keys -l -t "$codex_pane" "$codex_command"
+tmux send-keys -l -t "$codex_pane" \
+  'codex --dangerously-bypass-approvals-and-sandbox'
 tmux send-keys -t "$codex_pane" Enter
 
-tmux send-keys -l -t "$claude_pane" "$claude_command"
+tmux send-keys -l -t "$claude_pane" \
+  'claude --model fable --dangerously-skip-permissions --name fable-worker'
 tmux send-keys -t "$claude_pane" Enter
 ~~~
 
-The supervisor is not pretending both agents expose the same API. It only requires the same tiny contract:
+Those flags are intentionally dangerous. They remove local approval and sandbox boundaries; an empty working directory is tidiness, not isolation. I used them for a disposable test with harmless prompts. For real code, use safer permissions or put the whole lab inside an actual container.
 
-- a stable pane;
-- one scoped input;
-- a result file;
-- a status file.
-
-## Observe without guessing
-
-The screen remains useful for live inspection:
+After accepting each client's workspace prompt, both agents remained alive. I could watch them with:
 
 ~~~bash
-tmux list-panes -t agent-lab:0 \
-  -F '#{pane_id} #{pane_current_command} #{pane_dead}'
+tmux attach -t agent-lab
 
 tmux capture-pane -p -J -S -80 -t "$codex_pane"
 tmux capture-pane -p -J -S -80 -t "$claude_pane"
 ~~~
 
-But completion should come from the status files, not from trying to recognize a prompt visually:
+Detach with `Ctrl-b d`; the conversations continue. The interactive clients also persist their own session history, so keeping the pane alive is the fast path, not the only recovery path.
+
+## tmux is the bus
+
+The supervisor only needs two operations:
 
 ~~~bash
-test -f "$lab_root/codex.status" && cat "$lab_root/codex.status"
-test -f "$lab_root/claude.status" && cat "$lab_root/claude.status"
+send() {
+  local pane=$1
+  shift
+  tmux send-keys -l -t "$pane" "$*"
+  sleep 1
+  tmux send-keys -t "$pane" Enter
+}
+
+observe() {
+  tmux capture-pane -p -J -S -80 -t "$1"
+}
 ~~~
 
-In the test, Claude exceeded an initial budget of 0.05 USD. The supervisor observed the non-zero result, raised the ceiling to 0.25 USD, and retried only that worker. A failed worker did not take the rest of the system down.
+That tiny adapter is deliberately imperfect. During the experiment, Codex's paste protection once left a long prompt staged instead of submitted. The supervisor saw it in `capture-pane` and sent Enter again. This is a useful boundary: tmux transports keystrokes, but a full-screen TUI is not a machine protocol.
 
-That failure was more informative than a clean demo. A useful orchestrator needs <code>FAILED</code>, <code>BLOCKED</code>, and <code>TIMEOUT</code>, not just a cheerful success path.
+The eventual design avoids giant pasted prompts. It puts the task in a file and sends the agent a short nudge containing the path.
 
-## Hand work from one agent to another
+## The debate
 
-Once both workers finish, the supervisor can build a new prompt from their artifacts:
+I ran this on 7 August 2026 with tmux 3.6a, Codex CLI 0.146.0, and Claude Code 2.1.220. The two workers were GPT-5.6-Sol at max effort and Fable 5 at xhigh effort. I gave them the same question independently:
 
-~~~bash
-{
-  echo "Synthesize these two worker reports into a minimal state machine."
-  echo
-  echo "CODEX WORKER:"
-  cat "$lab_root/codex.out"
-  echo
-  echo "CLAUDE WORKER:"
-  cat "$lab_root/claude.out"
-} > "$lab_root/handoff.txt"
+> What is the simplest genuinely useful multi-agent framework for local coding agents? One machine, persistent interactive sessions, human attachment, and no external service.
 
-tmux send-keys -l -t "$codex_pane" \
-  "codex exec --ephemeral --sandbox read-only \
-  --skip-git-repo-check -C '$lab_root' \
-  - < '$lab_root/handoff.txt'"
-tmux send-keys -t "$codex_pane" Enter
+I then copied each answer into the other session. Neither agent was restarted between rounds.
+
+### Round one: independent positions
+
+They converged immediately on the important distinction.
+
+Fable called tmux “only the transport substrate” and proposed a shared filesystem protocol plus a small dispatcher. GPT-5.6-Sol also made tmux the substrate and called the files—not tmux—the coordination framework.
+
+Both rejected databases, brokers, networking, and agent graph libraries for this scale. Both made the attached human a first-class participant.
+
+### Round two: attack the weak point
+
+The disagreement was about how much distributed-systems machinery survives on one laptop.
+
+Fable attacked locks and atomic claims: with one dispatcher, there is no concurrent assignment race. Lock files introduce stale-lock recovery, exactly the sort of framework growth we were trying to avoid.
+
+GPT-5.6-Sol attacked the phrase “delivery semantics for free.” Atomic rename makes a transition durable, but it does not provide acknowledgement, deduplication, crash recovery, or proof that `send-keys` reached an idle prompt.
+
+That criticism improved both designs. They dropped `STATE.md`, duplicate status logs, locks, and automatic retries. The directory layout itself became the state machine.
+
+### Round three: converge
+
+Fable named the result `tmuxq`:
+
+~~~text
+queue/<id>.md
+    → active/<agent>/<id>.md
+    → done/<id>.md
 ~~~
 
-The resulting protocol was:
+Each task contains an objective, scope, and expected output. Moving the file is the state transition. The dispatcher moves it to one agent's active directory and sends a one-line nudge. The agent appends its result and moves the file to `done/`.
 
-> READY → INPUT → RUNNING → OUTPUT → DONE → READY<br>
-> RUNNING → BLOCKED | TIMEOUT → DONE
+GPT-5.6-Sol proposed the same state machine using filename suffixes instead of directories, plus a dispatcher under fifty lines of shell. Its unresolved problem was honest: `send-keys` preserves a transparent interactive session, but cannot prove that the agent is sitting at a safe prompt.
 
-That is the moment this becomes orchestration rather than two terminals running at once: the supervisor observes results, makes a routing decision, and creates the next task.
+### Round four: sign or dissent
 
-## Four rules that keep it sane
+I sent each final proposal to the other and allowed only `SIGN` or one indispensable change.
 
-**Use stable pane IDs.** Capture <code>#{pane_id}</code> when spawning a worker and verify it before every send.
+GPT-5.6-Sol replied:
 
-**Do not parse the screen as an API.** Capture-pane is excellent for humans and diagnostics. Machine state belongs in explicit result, status, and sentinel files.
+> SIGN
 
-**Isolate writers.** Read-only research workers can share a directory. Agents editing code should receive separate git worktrees and be integrated deliberately.
+Fable accepted the design with one condition:
 
-**Bound everything.** Give each task a wall-clock deadline, an inactivity timeout, a permission policy, and — where supported — a cost ceiling.
+> Agents must re-scan their active tasks at the end of every turn. Nudges should reduce latency, not carry correctness.
 
-Also remember that captured panes may contain source code, credentials, or command history. The supervisor is part of the security boundary.
+## The verdict
 
-## Where this stops being enough
+I accept that condition. The smallest useful design is:
 
-tmux is a good orchestrator for one machine, a handful of workers, and a human who wants to see what is happening. It is not a distributed queue, a durable database, or a cluster scheduler.
+1. One tmux session with persistent, named agent panes.
+2. Stable pane IDs captured when workers start.
+3. Files moving through `queue/`, `active/<agent>/`, and `done/` as the only durable task state.
+4. A tiny dispatcher that assigns work and sends short path-based nudges.
+5. Cooperative re-checking after each agent turn.
+6. A human supervisor for inspection, arbitration, and manual recovery.
 
-That is a feature. Start with the thing you can understand. Add infrastructure only when a real failure demands it.
+No locks. No database. No duplicate state file. No automatic retry engine. If a task stalls, the human can attach, see the conversation, and move it back to the queue.
 
-tmux is not the intelligence of the system. It is simply the table where the intelligences sit.
+There are really two useful layers here. For a live, supervised experiment, tmux plus `send-keys` is already orchestration. `tmuxq` is the smallest extra layer that makes the work crash-legible and recoverable.
+
+## The topology is not fixed
+
+The debate used two peers and a judge, but the same primitives can express a supervisor with many workers, a research-to-implementation pipeline, an author-reviewer loop, a hierarchy of supervisors, or a pool of temporary specialists.
+
+tmux does not decide who talks to whom. That topology is just routing policy. The panes are processes, pane IDs are addresses, `send-keys` is transport, files are durable state, and `attach` is the debugger.
+
+For one machine and a handful of coding agents, it is difficult to make a framework smaller without making the failure modes invisible.
+
+> tmux is not the intelligence of the system. It is the room where the intelligences keep talking.
