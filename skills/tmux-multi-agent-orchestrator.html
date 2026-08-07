@@ -179,6 +179,62 @@ observe() {
 
       <p>There are really two useful layers here. For a live, supervised experiment, tmux plus <code>send-keys</code> is already orchestration. <code>tmuxq</code> is the smallest extra layer that makes the work crash-legible and recoverable.</p>
 
+      <h2>A real opponent: GenSwarms</h2>
+
+      <p>The obvious criticism is that I won the argument by comparing tmux with imaginary enterprise sludge. So I sent both agents back to work on <a href="https://github.com/genlayerlabs/genswarms">GenSwarms</a>, a real Elixir/OTP runtime with declared graphs, deterministic objects, SQLite coordination, REST/WebSocket control, structured events, dynamic scaling, and Local, Docker, SSH, Bubblewrap, and Mock backends. Its <a href="https://github.com/genlayerlabs/genswarms/blob/main/docs/architecture.md">architecture</a>, <a href="https://github.com/genlayerlabs/genswarms/blob/main/docs/backends.md">backends</a>, and <a href="https://github.com/genlayerlabs/genswarms/blob/main/docs/security.md">security model</a> solve problems tmuxq deliberately ignores.</p>
+
+      <p>They independently found the same boundary:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>tmuxq</th>
+            <th>GenSwarms</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Existing Codex/Claude TUIs</td>
+            <td>Native, warm, attachable</td>
+            <td>Not first-class; real backends launch SubZeroClaw</td>
+          </tr>
+          <tr>
+            <td>Isolation</td>
+            <td>Shared user and trust boundary</td>
+            <td>Configurable Docker, bwrap, SSH, and network isolation</td>
+          </tr>
+          <tr>
+            <td>Durable control state</td>
+            <td>Files plus manual recovery</td>
+            <td>SQLite queue, OTP supervision, events, and commands</td>
+          </tr>
+          <tr>
+            <td>Topology and control</td>
+            <td>Whatever the supervisor routes</td>
+            <td>Declared graphs, validated mutations, API, live scaling</td>
+          </tr>
+          <tr>
+            <td>Debugging</td>
+            <td>Raw TUI and transparent files</td>
+            <td>Structured logs and event streams, but more layers</td>
+          </tr>
+          <tr>
+            <td>Setup and maintenance</td>
+            <td>tmux and a short shell script</td>
+            <td>Elixir/OTP, CLI build, SubZeroClaw, optionally Nix/containers</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>GenSwarms is clearly stronger when workers ingest hostile content, run without supervision, need an API, or span different machines. Those are not decorative features. tmuxq is stronger when the actual requirement is to coordinate a few existing coding-agent sessions while a human remains close enough to intervene.</p>
+
+      <p>The comparison also found an honest hole in the larger system. GenSwarms persists control-plane state, but a backend exit can still strand its in-memory inbox; the implementation emits <a href="https://github.com/genlayerlabs/genswarms/blob/9295e257cf64e29920968fb09e7b9f6ee8d08eed/lib/genswarms/agents/agent_server.ex#L384-L396"><code>inbox_dropped</code></a> rather than promising conversational resurrection. Workspace-backed agents retain a file inbox for audit and replay, but the documentation calls it an additional delivery channel, not the primary queue. tmuxq has the same class of failure with less ceremony: a dead pane can leave a task in <code>active/</code> forever.</p>
+
+      <p>So agent count is the wrong decision rule. Two unsupervised agents reading hostile input already justify isolation. Twelve trusted panes doing coarse work may still be perfectly manageable.</p>
+
+      <p>Each side found one feature worth stealing. tmuxq should append a non-authoritative JSONL event journal for diagnosis. GenSwarms should make its local backend attachable as a raw terminal. The most interesting system may be the hybrid: an OTP control plane whose local workers can still live in tmux.</p>
+
       <h2>The topology is not fixed</h2>
 
       <p>The debate used two peers and a judge, but the same primitives can express a supervisor with many workers, a research-to-implementation pipeline, an author-reviewer loop, a hierarchy of supervisors, or a pool of temporary specialists.</p>

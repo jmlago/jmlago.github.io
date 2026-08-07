@@ -145,6 +145,29 @@ No locks. No database. No duplicate state file. No automatic retry engine. If a 
 
 There are really two useful layers here. For a live, supervised experiment, tmux plus `send-keys` is already orchestration. `tmuxq` is the smallest extra layer that makes the work crash-legible and recoverable.
 
+## A real opponent: GenSwarms
+
+The obvious criticism is that I won the argument by comparing tmux with imaginary enterprise sludge. So I sent both agents back to work on [GenSwarms](https://github.com/genlayerlabs/genswarms), a real Elixir/OTP runtime with declared graphs, deterministic objects, SQLite coordination, REST/WebSocket control, structured events, dynamic scaling, and Local, Docker, SSH, Bubblewrap, and Mock backends. Its [architecture](https://github.com/genlayerlabs/genswarms/blob/main/docs/architecture.md), [backends](https://github.com/genlayerlabs/genswarms/blob/main/docs/backends.md), and [security model](https://github.com/genlayerlabs/genswarms/blob/main/docs/security.md) solve problems tmuxq deliberately ignores.
+
+They independently found the same boundary:
+
+| Question | tmuxq | GenSwarms |
+| --- | --- | --- |
+| Existing Codex/Claude TUIs | Native, warm, attachable | Not first-class; real backends launch SubZeroClaw |
+| Isolation | Shared user and trust boundary | Configurable Docker, bwrap, SSH, and network isolation |
+| Durable control state | Files plus manual recovery | SQLite queue, OTP supervision, events, and commands |
+| Topology and control | Whatever the supervisor routes | Declared graphs, validated mutations, API, live scaling |
+| Debugging | Raw TUI and transparent files | Structured logs and event streams, but more layers |
+| Setup and maintenance | tmux and a short shell script | Elixir/OTP, CLI build, SubZeroClaw, optionally Nix/containers |
+
+GenSwarms is clearly stronger when workers ingest hostile content, run without supervision, need an API, or span different machines. Those are not decorative features. tmuxq is stronger when the actual requirement is to coordinate a few existing coding-agent sessions while a human remains close enough to intervene.
+
+The comparison also found an honest hole in the larger system. GenSwarms persists control-plane state, but a backend exit can still strand its in-memory inbox; the implementation emits [`inbox_dropped`](https://github.com/genlayerlabs/genswarms/blob/9295e257cf64e29920968fb09e7b9f6ee8d08eed/lib/genswarms/agents/agent_server.ex#L384-L396) rather than promising conversational resurrection. Workspace-backed agents retain a file inbox for audit and replay, but the documentation calls it an additional delivery channel, not the primary queue. tmuxq has the same class of failure with less ceremony: a dead pane can leave a task in `active/` forever.
+
+So agent count is the wrong decision rule. Two unsupervised agents reading hostile input already justify isolation. Twelve trusted panes doing coarse work may still be perfectly manageable.
+
+Each side found one feature worth stealing. tmuxq should append a non-authoritative JSONL event journal for diagnosis. GenSwarms should make its local backend attachable as a raw terminal. The most interesting system may be the hybrid: an OTP control plane whose local workers can still live in tmux.
+
 ## The topology is not fixed
 
 The debate used two peers and a judge, but the same primitives can express a supervisor with many workers, a research-to-implementation pipeline, an author-reviewer loop, a hierarchy of supervisors, or a pool of temporary specialists.
